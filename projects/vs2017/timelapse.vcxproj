@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\build</OutDir>
+    <OutDir>$(SolutionDir)..\..\build\</OutDir>
     <IntDir>$(SolutionDir)..\..\artifacts\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,7 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\build</OutDir>
+    <OutDir>$(SolutionDir)..\..\build\</OutDir>
     <IntDir>$(SolutionDir)..\..\artifacts\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -151,18 +151,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="../../timelapse/resource.h" />
-    <ClInclude Include="../../timelapse/stdafx.h" />
-    <ClInclude Include="../../timelapse/targetver.h" />
-    <ClInclude Include="../../timelapse/timelapse.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="../../timelapse/stdafx.cpp">
+    <ClInclude Include="stdafx.h" />
+    <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="../../timelapse/resource.h" />
+    <ClInclude Include="../../timelapse/timelapse.h" />
     <ClCompile Include="../../timelapse/timelapse.cpp" />
   </ItemGroup>
   <ItemGroup>

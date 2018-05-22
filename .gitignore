@@ -1,0 +1,114 @@
+# Build directories and intermediate files
+
+Debug/
+Dev/
+Release/
+Shipping/
+GeneratedFiles/
+ipch/
+SRV/
+*.lastcodeanalysissucceeded
+assets/
+/*/*_intermediate_*/
+/*/*/*_intermediate_*/
+/build/
+/artifacts/
+
+# File patterns
+
+*.a
+*.app
+*.aps
+*.diff
+*.dll
+*.dmp
+*.dylib
+*.exe
+*.fxo
+*.jobbin2
+*.la
+*.lib
+*.lo
+*.log
+*.map
+*.mk
+*.ncb
+*.o
+*.obj
+*.opensdf
+*.opendb
+*.out
+*.patch
+*.pdb
+*.pri
+*.pyc
+*.sdf
+*.sln.cache
+*.slo
+*.so
+*.swp
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.tmp_proj
+*.tern-port
+*.tss
+*.user
+*.vc.db
+*.VC.db
+*.vcproj
+*.vcxproj
+*.vcxproj.filters
+*.xcodeproj
+*.xcworkspace
+*.vtcache
+*.old
+*.bck
+TestResult.xml
+
+# task output
+
+output/
+redist/
+binaries/
+
+# Private files
+
+*.orig
+p4/
+.project
+.makeargs
+make_args.txt
+
+# OS X files
+
+*.DS_Store
+*~
+
+# The visual studio debugger visualizer dll
+
+!/tools/visual_studio_plugins/*.dll
+
+# Wwise user files
+
+*.wsettings
+*.validationcache
+.backup/
+.cache/
+
+# node generated files
+package-lock.json
+node_modules/
+
+# Visual Studio Code config
+.vscodeignore
+.vscode
+.settings
+jsconfig.json
+.vs/
+
+# Webstorm project folder
+.idea/
+
+# Vim local settings
+.vimlocal

@@ -1,4 +1,4 @@
 HQ Timelapse View
 =================
 
-![preview](https://user-images.githubusercontent.com/4054655/40423605-1ba8013c-5e61-11e8-87e6-7b9479b81f54.gif)
+![preview](https://user-images.githubusercontent.com/4054655/40423967-1aa61b10-5e62-11e8-809d-34161adc19f6.gif)

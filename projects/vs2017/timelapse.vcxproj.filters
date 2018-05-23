@@ -6,13 +6,13 @@
       <Filter>resources</Filter>
     </ClInclude>
     <ClInclude Include="..\..\stb\stb_textedit.h">
-      <Filter>stb</Filter>
+      <Filter>external\stb</Filter>
     </ClInclude>
     <ClInclude Include="..\..\stb\stb_truetype.h">
-      <Filter>stb</Filter>
+      <Filter>external\stb</Filter>
     </ClInclude>
     <ClInclude Include="..\..\stb\stb_rect_pack.h">
-      <Filter>stb</Filter>
+      <Filter>external\stb</Filter>
     </ClInclude>
     <ClInclude Include="..\..\imgui\imgui_internal.h">
       <Filter>imgui</Filter>
@@ -20,14 +20,26 @@
     <ClInclude Include="..\..\imgui\imgui.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>resources</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>resources</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\imgui\imconfig.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gl3w\GL\glcorearb.h">
+      <Filter>external\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gl3w\GL\gl3w.h">
+      <Filter>external\gl3w</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\glfw\include\GLFW\glfw3.h">
+      <Filter>external\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\glfw\include\GLFW\glfw3native.h">
+      <Filter>external\glfw</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>pch</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>pch</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,8 +53,12 @@
     <ClCompile Include="..\..\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\timelapse\main.cpp" />
+    <ClCompile Include="..\..\gl3w\GL\gl3w.c">
+      <Filter>external\gl3w</Filter>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>resources</Filter>
+      <Filter>pch</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,8 +76,20 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{8a9df391-e467-4641-94d4-cb926c006231}</UniqueIdentifier>
     </Filter>
-    <Filter Include="stb">
+    <Filter Include="external">
+      <UniqueIdentifier>{82d423fc-145a-4410-93ce-f155372c6010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\stb">
       <UniqueIdentifier>{7aaa8f4f-dfd8-43eb-9eb0-d78ca904cccc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\gl3w">
+      <UniqueIdentifier>{35f6756b-aac4-443e-943c-d8bdd99e92b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\glfw">
+      <UniqueIdentifier>{6276239a-1e66-412a-9098-502415482909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pch">
+      <UniqueIdentifier>{733645dc-9020-43c3-90ad-59831ea47b79}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

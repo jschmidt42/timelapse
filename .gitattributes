@@ -3,14 +3,14 @@
 # Text files
 
 *.bsdoc text
-*.c text
+*.c text eol=lf
 *.config text
-*.cpp text
+*.cpp text eol=lf
 *.cs text
 *.css text
 *.DotSettings text
 *.erb text
-*.h text
+*.h text eol=lf
 *.H text
 *.html text
 *.inl text

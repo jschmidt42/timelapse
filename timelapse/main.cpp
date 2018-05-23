@@ -551,18 +551,13 @@ int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCm
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
         ImGui_ImplGlfwGL3_NewFrame();
-
-        #if !NDEBUG
-            bool show_demo_window = true;
-            ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-            ImGui::ShowDemoWindow(&show_demo_window);
-        #endif
-
-        tl::render();
-
-        // Rendering
+        
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
+
+        tl::render(display_w, display_h);
+
+        // Rendering
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);

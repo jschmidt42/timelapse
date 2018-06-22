@@ -223,6 +223,9 @@
     <ClInclude Include="..\..\timelapse\session.h">
       <Filter>timelapse</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\timelapse\scoped_string.h">
+      <Filter>timelapse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\imgui\imgui.cpp">

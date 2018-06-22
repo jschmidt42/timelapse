@@ -18,6 +18,7 @@ void cleanup()
 
 void setup(const char* file_path)
 {
+    // setup can be called multiple times, so cleaning up first.
     cleanup();
 
     if (file_path)

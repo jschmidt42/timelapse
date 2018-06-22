@@ -296,6 +296,7 @@
     <ClInclude Include="../../timelapse/timelapse.h" />
     <ClCompile Include="../../timelapse/timelapse.cpp" />
     <ClInclude Include="..\..\timelapse\scm_proxy.h" />
+    <ClInclude Include="..\..\timelapse\scoped_string.h" />
     <ClInclude Include="..\..\timelapse\session.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,8 @@
-#include "stdafx.h"
 #include "timelapse.h"
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
+
+#include <foundation/foundation.h>
 
 #include <cstdio>
 
@@ -14,6 +15,10 @@
 #define GLFW_EXPOSE_NATIVE_WGL
 #include <GLFW/glfw3native.h>
 #endif
+
+#pragma comment( lib, "glfw3.lib" )
+#pragma comment( lib, "opengl32.lib" )
+#pragma comment( lib, "legacy_stdio_definitions.lib" )
 
 // GLFW data
 static GLFWwindow*  g_Window = nullptr;
@@ -333,7 +338,7 @@ static bool ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, c
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;   // We can honor GetMouseCursor() values (optional)
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;    // We can honor io.WantSetMousePos requests (optional, rarely used)
 
-                                                            // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
+    // Keyboard mapping. ImGui will use those indices to peek into the io.KeysDown[] array.
     io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
     io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
     io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
@@ -359,9 +364,9 @@ static bool ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, c
     io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplGlfwGL3_GetClipboardText;
     io.ClipboardUserData = g_Window;
-#ifdef _WIN32
-    io.ImeWindowHandle = glfwGetWin32Window(g_Window);
-#endif
+    #ifdef _WIN32
+        io.ImeWindowHandle = glfwGetWin32Window(g_Window);
+    #endif
 
     // Load cursors
     // FIXME: GLFW doesn't expose suitable cursors for ResizeAll, ResizeNESW, ResizeNWSE. We revert to arrow cursor for those.
@@ -458,8 +463,8 @@ static void ImGui_ImplGlfwGL3_NewFrame()
     if (io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad)
     {
         // Update gamepad inputs
-#define MAP_BUTTON(NAV_NO, BUTTON_NO)       { if (buttons_count > (BUTTON_NO) && buttons[BUTTON_NO] == GLFW_PRESS) io.NavInputs[NAV_NO] = 1.0f; }
-#define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1) { float v = (axes_count > (AXIS_NO)) ? axes[AXIS_NO] : (V0); v = (v - (V0)) / ((V1) - (V0)); if (v > 1.0f) v = 1.0f; if (io.NavInputs[NAV_NO] < v) io.NavInputs[NAV_NO] = v; }
+        #define MAP_BUTTON(NAV_NO, BUTTON_NO)       { if (buttons_count > (BUTTON_NO) && buttons[BUTTON_NO] == GLFW_PRESS) io.NavInputs[NAV_NO] = 1.0f; }
+        #define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1) { float v = (axes_count > (AXIS_NO)) ? axes[AXIS_NO] : (V0); v = (v - (V0)) / ((V1) - (V0)); if (v > 1.0f) v = 1.0f; if (io.NavInputs[NAV_NO] < v) io.NavInputs[NAV_NO] = v; }
         int axes_count = 0, buttons_count = 0;
         const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axes_count);
         const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttons_count);
@@ -479,8 +484,8 @@ static void ImGui_ImplGlfwGL3_NewFrame()
         MAP_ANALOG(ImGuiNavInput_LStickRight, 0, +0.3f, +0.9f);
         MAP_ANALOG(ImGuiNavInput_LStickUp, 1, +0.3f, +0.9f);
         MAP_ANALOG(ImGuiNavInput_LStickDown, 1, -0.3f, -0.9f);
-#undef MAP_BUTTON
-#undef MAP_ANALOG
+        #undef MAP_BUTTON
+        #undef MAP_ANALOG
         if (axes_count > 0 && buttons_count > 0)
             io.BackendFlags |= ImGuiBackendFlags_HasGamepad;
         else
@@ -496,14 +501,11 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "Error %d: %s\n", error, description);
 }
 
-int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCmdLine*/, int /*nCmdShow*/)
+int main_initialize()
 {
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
-        return 1;
-
-    if (!tl::setup("C:\\work\\unity\\Editor\\Mono\\EditorResources.cs"))
         return 1;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -513,6 +515,7 @@ int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCm
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Timelapse", nullptr, nullptr);
+
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     gl3wInit();
@@ -521,33 +524,41 @@ int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCm
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     ImGui_ImplGlfwGL3_Init(window, true);
 
     // Setup style
     //ImGui::StyleColorsDark();
     ImGui::StyleColorsClassic();
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them. 
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple. 
-    // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Read 'misc/fonts/README.txt' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != NULL);
+    memory_set_tracker(memory_tracker_local());
 
+    // Use default values for foundation config
+    foundation_config_t config;
+    memset(&config, 0, sizeof config);
+
+    // Declare the application
+    application_t application;
+    memset(&application, 0, sizeof application);
+
+    // Suppress debug messages
+    log_set_suppress(0, ERRORLEVEL_DEBUG);
+
+    tl::configure(config, application);
+
+    int init_result = foundation_initialize(memory_system_malloc(), application, config);
+    if (init_result)
+        return init_result;
+    
+    return tl::initialize(window);
+}
+
+int main_run(void*)
+{
     const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    while (!glfwWindowShouldClose(window))
+    while (!glfwWindowShouldClose(g_Window))
     {
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
@@ -555,9 +566,9 @@ int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCm
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
         ImGui_ImplGlfwGL3_NewFrame();
-        
+
         int display_w, display_h;
-        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glfwGetFramebufferSize(g_Window, &display_w, &display_h);
 
         tl::render(display_w, display_h);
 
@@ -567,15 +578,22 @@ int wWinMain(HINSTANCE /*hInstance*/, HINSTANCE /*hPrevInstance*/, LPWSTR /*lpCm
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
         ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(g_Window);
     }
+
+    return 0;
+}
+
+void main_finalize()
+{
+    tl::shutdown();
 
     // Cleanup
     ImGui_ImplGlfwGL3_Shutdown();
     ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(g_Window);
     glfwTerminate();
 
-    return 0;
+    g_Window = nullptr;
 }

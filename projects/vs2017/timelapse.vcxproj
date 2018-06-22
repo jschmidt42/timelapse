@@ -23,6 +23,7 @@
     <ProjectGuid>{691D6488-17E6-4415-9086-F268DA799DD6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>timelapse</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -42,14 +43,12 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,13 +100,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BUILD_DEBUG=1;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\;$(SolutionDir)..\..\external\stb;$(SolutionDir)..\..\external\gl3w;$(SolutionDir)..\..\external\glfw\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\;$(SolutionDir)..\..\external;$(SolutionDir)..\..\external\stb;$(SolutionDir)..\..\external\gl3w;$(SolutionDir)..\..\external\glfw\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -137,15 +136,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;BUILD_RELEASE=1;BUILD_DEPLOY=1;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\;$(SolutionDir)..\..\external\stb;$(SolutionDir)..\..\external\gl3w;$(SolutionDir)..\..\external\glfw\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\..\;$(SolutionDir)..\..\external;$(SolutionDir)..\..\external\stb;$(SolutionDir)..\..\external\gl3w;$(SolutionDir)..\..\external\glfw\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -164,17 +162,123 @@
     <ClInclude Include="..\..\external\gl3w\GL\glcorearb.h" />
     <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3.h" />
     <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="..\..\external\stb\stb_image.h" />
+    <ClInclude Include="..\..\foundation\android.h" />
+    <ClInclude Include="..\..\foundation\apple.h" />
+    <ClInclude Include="..\..\foundation\array.h" />
+    <ClInclude Include="..\..\foundation\assert.h" />
+    <ClInclude Include="..\..\foundation\assetstream.h" />
+    <ClInclude Include="..\..\foundation\atomic.h" />
+    <ClInclude Include="..\..\foundation\base64.h" />
+    <ClInclude Include="..\..\foundation\beacon.h" />
+    <ClInclude Include="..\..\foundation\bitbuffer.h" />
+    <ClInclude Include="..\..\foundation\bits.h" />
+    <ClInclude Include="..\..\foundation\blowfish.h" />
+    <ClInclude Include="..\..\foundation\bufferstream.h" />
+    <ClInclude Include="..\..\foundation\build.h" />
+    <ClInclude Include="..\..\foundation\delegate.h" />
+    <ClInclude Include="..\..\foundation\environment.h" />
+    <ClInclude Include="..\..\foundation\error.h" />
+    <ClInclude Include="..\..\foundation\event.h" />
+    <ClInclude Include="..\..\foundation\exception.h" />
+    <ClInclude Include="..\..\foundation\foundation.h" />
+    <ClInclude Include="..\..\foundation\fs.h" />
+    <ClInclude Include="..\..\foundation\hash.h" />
+    <ClInclude Include="..\..\foundation\hashmap.h" />
+    <ClInclude Include="..\..\foundation\hashstrings.h" />
+    <ClInclude Include="..\..\foundation\hashtable.h" />
+    <ClInclude Include="..\..\foundation\internal.h" />
+    <ClInclude Include="..\..\foundation\json.h" />
+    <ClInclude Include="..\..\foundation\library.h" />
+    <ClInclude Include="..\..\foundation\locale.h" />
+    <ClInclude Include="..\..\foundation\log.h" />
+    <ClInclude Include="..\..\foundation\main.h" />
+    <ClInclude Include="..\..\foundation\math.h" />
+    <ClInclude Include="..\..\foundation\md5.h" />
+    <ClInclude Include="..\..\foundation\memory.h" />
+    <ClInclude Include="..\..\foundation\mutex.h" />
+    <ClInclude Include="..\..\foundation\objectmap.h" />
+    <ClInclude Include="..\..\foundation\path.h" />
+    <ClInclude Include="..\..\foundation\pipe.h" />
+    <ClInclude Include="..\..\foundation\platform.h" />
+    <ClInclude Include="..\..\foundation\pnacl.h" />
+    <ClInclude Include="..\..\foundation\posix.h" />
+    <ClInclude Include="..\..\foundation\process.h" />
+    <ClInclude Include="..\..\foundation\profile.h" />
+    <ClInclude Include="..\..\foundation\radixsort.h" />
+    <ClInclude Include="..\..\foundation\random.h" />
+    <ClInclude Include="..\..\foundation\regex.h" />
+    <ClInclude Include="..\..\foundation\ringbuffer.h" />
+    <ClInclude Include="..\..\foundation\semaphore.h" />
+    <ClInclude Include="..\..\foundation\sha.h" />
+    <ClInclude Include="..\..\foundation\stacktrace.h" />
+    <ClInclude Include="..\..\foundation\stream.h" />
+    <ClInclude Include="..\..\foundation\string.h" />
+    <ClInclude Include="..\..\foundation\system.h" />
+    <ClInclude Include="..\..\foundation\thread.h" />
+    <ClInclude Include="..\..\foundation\time.h" />
+    <ClInclude Include="..\..\foundation\tizen.h" />
+    <ClInclude Include="..\..\foundation\types.h" />
+    <ClInclude Include="..\..\foundation\uuid.h" />
+    <ClInclude Include="..\..\foundation\version.h" />
+    <ClInclude Include="..\..\foundation\windows.h" />
     <ClInclude Include="..\..\imgui\imconfig.h" />
     <ClInclude Include="..\..\imgui\imgui.h" />
     <ClInclude Include="..\..\imgui\imgui_internal.h" />
     <ClInclude Include="..\..\external\stb\stb_rect_pack.h" />
     <ClInclude Include="..\..\external\stb\stb_textedit.h" />
     <ClInclude Include="..\..\external\stb\stb_truetype.h" />
-    <ClInclude Include="stdafx.h" />
     <ClCompile Include="..\..\external\gl3w\GL\gl3w.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\..\foundation\android.c" />
+    <ClCompile Include="..\..\foundation\array.c" />
+    <ClCompile Include="..\..\foundation\assert.c" />
+    <ClCompile Include="..\..\foundation\assetstream.c" />
+    <ClCompile Include="..\..\foundation\atomic.c" />
+    <ClCompile Include="..\..\foundation\base64.c" />
+    <ClCompile Include="..\..\foundation\beacon.c" />
+    <ClCompile Include="..\..\foundation\bitbuffer.c" />
+    <ClCompile Include="..\..\foundation\blowfish.c" />
+    <ClCompile Include="..\..\foundation\bufferstream.c" />
+    <ClCompile Include="..\..\foundation\environment.c" />
+    <ClCompile Include="..\..\foundation\error.c" />
+    <ClCompile Include="..\..\foundation\event.c" />
+    <ClCompile Include="..\..\foundation\exception.c" />
+    <ClCompile Include="..\..\foundation\foundation.c" />
+    <ClCompile Include="..\..\foundation\fs.c" />
+    <ClCompile Include="..\..\foundation\hash.c" />
+    <ClCompile Include="..\..\foundation\hashmap.c" />
+    <ClCompile Include="..\..\foundation\hashtable.c" />
+    <ClCompile Include="..\..\foundation\json.c" />
+    <ClCompile Include="..\..\foundation\library.c" />
+    <ClCompile Include="..\..\foundation\log.c" />
+    <ClCompile Include="..\..\foundation\main.c" />
+    <ClCompile Include="..\..\foundation\md5.c" />
+    <ClCompile Include="..\..\foundation\memory.c" />
+    <ClCompile Include="..\..\foundation\mutex.c" />
+    <ClCompile Include="..\..\foundation\objectmap.c" />
+    <ClCompile Include="..\..\foundation\path.c" />
+    <ClCompile Include="..\..\foundation\pipe.c" />
+    <ClCompile Include="..\..\foundation\pnacl.c" />
+    <ClCompile Include="..\..\foundation\process.c" />
+    <ClCompile Include="..\..\foundation\profile.c" />
+    <ClCompile Include="..\..\foundation\radixsort.c" />
+    <ClCompile Include="..\..\foundation\random.c" />
+    <ClCompile Include="..\..\foundation\regex.c" />
+    <ClCompile Include="..\..\foundation\ringbuffer.c" />
+    <ClCompile Include="..\..\foundation\semaphore.c" />
+    <ClCompile Include="..\..\foundation\sha.c" />
+    <ClCompile Include="..\..\foundation\stacktrace.c" />
+    <ClCompile Include="..\..\foundation\stream.c" />
+    <ClCompile Include="..\..\foundation\string.c" />
+    <ClCompile Include="..\..\foundation\system.c" />
+    <ClCompile Include="..\..\foundation\thread.c" />
+    <ClCompile Include="..\..\foundation\time.c" />
+    <ClCompile Include="..\..\foundation\tizen.c" />
+    <ClCompile Include="..\..\foundation\uuid.c" />
+    <ClCompile Include="..\..\foundation\version.c" />
     <ClCompile Include="..\..\imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
@@ -183,14 +287,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\timelapse\main.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClInclude Include="targetver.h" />
+    <ClCompile Include="..\..\timelapse\boot.cpp" />
     <ClInclude Include="../../timelapse/resource.h" />
     <ClInclude Include="../../timelapse/timelapse.h" />
     <ClCompile Include="../../timelapse/timelapse.cpp" />
@@ -204,6 +301,15 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\..\imgui\natvis\imgui.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\foundation\delegate.m" />
+    <None Include="..\..\foundation\environment.m" />
+    <None Include="..\..\foundation\fs.m" />
+    <None Include="..\..\foundation\system.m" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\foundation\hashstrings.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

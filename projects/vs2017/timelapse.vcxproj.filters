@@ -35,11 +35,185 @@
     <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3native.h">
       <Filter>external\glfw</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>pch</Filter>
+    <ClInclude Include="..\..\foundation\android.h">
+      <Filter>foundation</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>pch</Filter>
+    <ClInclude Include="..\..\foundation\apple.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\array.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\assert.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\atomic.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\base64.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\beacon.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\bitbuffer.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\bits.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\blowfish.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\bufferstream.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\build.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\delegate.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\environment.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\error.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\event.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\exception.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\foundation.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\fs.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\hash.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\hashmap.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\hashstrings.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\hashtable.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\internal.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\json.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\library.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\locale.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\log.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\main.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\math.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\md5.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\memory.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\mutex.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\objectmap.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\path.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\pipe.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\platform.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\pnacl.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\posix.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\process.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\profile.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\radixsort.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\random.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\regex.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\ringbuffer.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\semaphore.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\sha.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\stacktrace.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\stream.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\string.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\system.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\thread.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\time.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\tizen.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\types.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\uuid.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\version.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\windows.h">
+      <Filter>foundation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\external\stb\stb_image.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\foundation\assetstream.h">
+      <Filter>foundation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -50,12 +224,150 @@
     <ClCompile Include="..\..\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\timelapse\main.cpp" />
     <ClCompile Include="..\..\external\gl3w\GL\gl3w.c">
       <Filter>external\gl3w</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>pch</Filter>
+    <ClCompile Include="..\..\timelapse\boot.cpp" />
+    <ClCompile Include="..\..\foundation\android.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\array.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\assert.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\assetstream.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\atomic.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\base64.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\beacon.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\bitbuffer.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\blowfish.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\bufferstream.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\environment.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\error.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\event.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\exception.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\foundation.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\fs.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\hash.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\hashmap.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\hashtable.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\json.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\log.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\main.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\md5.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\memory.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\mutex.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\objectmap.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\path.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\pipe.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\pnacl.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\process.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\profile.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\radixsort.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\random.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\regex.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\ringbuffer.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\semaphore.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\sha.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\stacktrace.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\stream.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\string.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\system.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\thread.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\time.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\tizen.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\uuid.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\version.c">
+      <Filter>foundation\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\foundation\library.c">
+      <Filter>foundation\c</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -85,8 +397,11 @@
     <Filter Include="external\glfw">
       <UniqueIdentifier>{6276239a-1e66-412a-9098-502415482909}</UniqueIdentifier>
     </Filter>
-    <Filter Include="pch">
-      <UniqueIdentifier>{733645dc-9020-43c3-90ad-59831ea47b79}</UniqueIdentifier>
+    <Filter Include="foundation">
+      <UniqueIdentifier>{71fc0a66-94a8-4c89-9af8-2435053e4b53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="foundation\c">
+      <UniqueIdentifier>{c276e282-cd1d-47ba-972e-fab355baa6ad}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,5 +413,24 @@
     <Natvis Include="..\..\imgui\natvis\imgui.natvis">
       <Filter>imgui</Filter>
     </Natvis>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\foundation\system.m">
+      <Filter>foundation</Filter>
+    </None>
+    <None Include="..\..\foundation\delegate.m">
+      <Filter>foundation\c</Filter>
+    </None>
+    <None Include="..\..\foundation\environment.m">
+      <Filter>foundation\c</Filter>
+    </None>
+    <None Include="..\..\foundation\fs.m">
+      <Filter>foundation\c</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\foundation\hashstrings.txt">
+      <Filter>foundation</Filter>
+    </Text>
   </ItemGroup>
 </Project>

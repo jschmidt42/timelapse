@@ -13,6 +13,7 @@ assets/
 /*/*/*_intermediate_*/
 /build/
 /artifacts/
+_ReSharper.Caches/
 
 # File patterns
 

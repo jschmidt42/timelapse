@@ -145,6 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)..\..\;$(SolutionDir)..\..\external;$(SolutionDir)..\..\external\stb;$(SolutionDir)..\..\external\gl3w;$(SolutionDir)..\..\external\glfw\include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,9 +156,12 @@
       <AdditionalOptions> /ignore:4217  /ignore:4049 %(AdditionalOptions)</AdditionalOptions>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\timelapse\scm_proxy.cpp" />
+    <ClCompile Include="..\..\timelapse\session.cpp" />
     <ClInclude Include="..\..\external\gl3w\GL\gl3w.h" />
     <ClInclude Include="..\..\external\gl3w\GL\glcorearb.h" />
     <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3.h" />
@@ -291,12 +295,13 @@
     <ClInclude Include="../../timelapse/resource.h" />
     <ClInclude Include="../../timelapse/timelapse.h" />
     <ClCompile Include="../../timelapse/timelapse.cpp" />
+    <ClInclude Include="..\..\timelapse\scm_proxy.h" />
+    <ClInclude Include="..\..\timelapse\session.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="../../timelapse/timelapse.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="../../resources/small.ico" />
     <Image Include="../../resources/timelapse.ico" />
   </ItemGroup>
   <ItemGroup>

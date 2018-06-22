@@ -1,10 +1,7 @@
-#include "timelapse.h"
+#include "resource.h"
 
 #include <imgui/imgui.h>
-
 #include <foundation/foundation.h>
-
-#include <cstdio>
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
@@ -20,6 +17,13 @@
 #pragma comment( lib, "opengl32.lib" )
 #pragma comment( lib, "legacy_stdio_definitions.lib" )
 
+// Application specific routines
+extern void app_configure(foundation_config_t& config, application_t& application);
+extern int app_initialize(GLFWwindow* window);
+extern void app_render(int display_w, int display_h);
+extern void app_shutdown();
+extern const char* app_title();
+
 // GLFW data
 static GLFWwindow*  g_Window = nullptr;
 static double       g_Time = 0.0;
@@ -34,7 +38,7 @@ static int          g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
 static int          g_AttribLocationPosition = 0, g_AttribLocationUV = 0, g_AttribLocationColor = 0;
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
-static void ImGui_ImplGlfwGL3_RenderDrawData(ImDrawData* draw_data)
+static void imgui_impl_glfw_gl3_render_draw_data(ImDrawData* draw_data)
 {
     // Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
     ImGuiIO& io = ImGui::GetIO();
@@ -152,30 +156,30 @@ static void ImGui_ImplGlfwGL3_RenderDrawData(ImDrawData* draw_data)
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 
-static const char* ImGui_ImplGlfwGL3_GetClipboardText(void* user_data)
+static const char* imgui_impl_glfw_gl3_get_clipboard_text(void* user_data)
 {
     return glfwGetClipboardString((GLFWwindow*)user_data);
 }
 
-static void ImGui_ImplGlfwGL3_SetClipboardText(void* user_data, const char* text)
+static void imgui_impl_glfw_gl3_set_clipboard_text(void* user_data, const char* text)
 {
     glfwSetClipboardString((GLFWwindow*)user_data, text);
 }
 
-static void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow*, int button, int action, int /*mods*/)
+static void imgui_impl_glfw_mouse_button_callback(GLFWwindow*, int button, int action, int /*mods*/)
 {
     if (action == GLFW_PRESS && button >= 0 && button < 3)
         g_MouseJustPressed[button] = true;
 }
 
-static void ImGui_ImplGlfw_ScrollCallback(GLFWwindow*, double xoffset, double yoffset)
+static void imgui_impl_glfw_scroll_callback(GLFWwindow*, double xoffset, double yoffset)
 {
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheelH += (float)xoffset;
     io.MouseWheel += (float)yoffset;
 }
 
-static void ImGui_ImplGlfw_KeyCallback(GLFWwindow*, int key, int, int action, int mods)
+static void imgui_impl_glfw_key_callback(GLFWwindow*, int key, int, int action, int mods)
 {
     ImGuiIO& io = ImGui::GetIO();
     if (action == GLFW_PRESS)
@@ -190,14 +194,14 @@ static void ImGui_ImplGlfw_KeyCallback(GLFWwindow*, int key, int, int action, in
     io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 }
 
-static void ImGui_ImplGlfw_CharCallback(GLFWwindow*, unsigned int c)
+static void imgui_impl_glfw_char_callback(GLFWwindow*, unsigned int c)
 {
     ImGuiIO& io = ImGui::GetIO();
     if (c > 0 && c < 0x10000)
         io.AddInputCharacter((unsigned short)c);
 }
 
-static bool ImGui_ImplGlfwGL3_CreateFontsTexture()
+static bool imgui_impl_glfw_gl3_create_fonts_texture()
 {
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
@@ -223,7 +227,7 @@ static bool ImGui_ImplGlfwGL3_CreateFontsTexture()
     return true;
 }
 
-static bool ImGui_ImplGlfwGL3_CreateDeviceObjects()
+static bool imgui_impl_glfw_gl3_create_device_objects()
 {
     // Backup GL state
     GLint last_texture, last_array_buffer, last_vertex_array;
@@ -278,7 +282,7 @@ static bool ImGui_ImplGlfwGL3_CreateDeviceObjects()
     glGenBuffers(1, &g_VboHandle);
     glGenBuffers(1, &g_ElementsHandle);
 
-    ImGui_ImplGlfwGL3_CreateFontsTexture();
+    imgui_impl_glfw_gl3_create_fonts_texture();
 
     // Restore modified GL state
     glBindTexture(GL_TEXTURE_2D, last_texture);
@@ -288,7 +292,7 @@ static bool ImGui_ImplGlfwGL3_CreateDeviceObjects()
     return true;
 }
 
-static void ImGui_ImplGlfwGL3_InvalidateDeviceObjects()
+static void imgui_impl_glfw_gl3_invalidate_device_objects()
 {
     if (g_VboHandle) glDeleteBuffers(1, &g_VboHandle);
     if (g_ElementsHandle) glDeleteBuffers(1, &g_ElementsHandle);
@@ -313,15 +317,15 @@ static void ImGui_ImplGlfwGL3_InvalidateDeviceObjects()
     }
 }
 
-static void ImGui_ImplGlfw_InstallCallbacks(GLFWwindow* window)
+static void imgui_impl_glfw_install_callbacks(GLFWwindow* window)
 {
-    glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
-    glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-    glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-    glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
+    glfwSetMouseButtonCallback(window, imgui_impl_glfw_mouse_button_callback);
+    glfwSetScrollCallback(window, imgui_impl_glfw_scroll_callback);
+    glfwSetKeyCallback(window, imgui_impl_glfw_key_callback);
+    glfwSetCharCallback(window, imgui_impl_glfw_char_callback);
 }
 
-static bool ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, const char* glsl_version = nullptr)
+static bool imgui_impl_glfw_gl3_init(GLFWwindow* window, bool install_callbacks, const char* glsl_version = nullptr)
 {
     g_Window = window;
     g_Time = 0.0;
@@ -361,8 +365,8 @@ static bool ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, c
     io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
     io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-    io.SetClipboardTextFn = ImGui_ImplGlfwGL3_SetClipboardText;
-    io.GetClipboardTextFn = ImGui_ImplGlfwGL3_GetClipboardText;
+    io.SetClipboardTextFn = imgui_impl_glfw_gl3_set_clipboard_text;
+    io.GetClipboardTextFn = imgui_impl_glfw_gl3_get_clipboard_text;
     io.ClipboardUserData = g_Window;
     #ifdef _WIN32
         io.ImeWindowHandle = glfwGetWin32Window(g_Window);
@@ -379,12 +383,12 @@ static bool ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, c
     g_MouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
 
     if (install_callbacks)
-        ImGui_ImplGlfw_InstallCallbacks(window);
+        imgui_impl_glfw_install_callbacks(window);
 
     return true;
 }
 
-static void ImGui_ImplGlfwGL3_Shutdown()
+static void imgui_impl_glfw_gl3_shutdown()
 {
     // Destroy GLFW mouse cursors
     for (auto& g_MouseCursor : g_MouseCursors)
@@ -392,13 +396,13 @@ static void ImGui_ImplGlfwGL3_Shutdown()
     memset(g_MouseCursors, 0, sizeof(g_MouseCursors));
 
     // Destroy OpenGL objects
-    ImGui_ImplGlfwGL3_InvalidateDeviceObjects();
+    imgui_impl_glfw_gl3_invalidate_device_objects();
 }
 
-static void ImGui_ImplGlfwGL3_NewFrame()
+static void imgui_impl_glfw_gl3_new_frame()
 {
     if (!g_FontTexture)
-        ImGui_ImplGlfwGL3_CreateDeviceObjects();
+        imgui_impl_glfw_gl3_create_device_objects();
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -496,17 +500,29 @@ static void ImGui_ImplGlfwGL3_NewFrame()
     ImGui::NewFrame();
 }
 
-static void glfw_error_callback(int error, const char* description)
+static void setup_imgui(GLFWwindow* window)
 {
-    fprintf(stderr, "Error %d: %s\n", error, description);
+    // Setup Dear ImGui binding
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.WantSaveIniSettings = false;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    imgui_impl_glfw_gl3_init(window, true);
+
+    // Setup style
+    //ImGui::StyleColorsDark();
+    ImGui::StyleColorsClassic();
 }
 
-int main_initialize()
+static GLFWwindow* setup_main_window()
 {
     // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
+    glfwSetErrorCallback([](int error, const char* description) {
+        log_errorf(HASH_TEST, ERROR_EXCEPTION, STRING_CONST("Error %d: %s"), error, description);
+    });
     if (!glfwInit())
-        return 1;
+        return nullptr;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -514,50 +530,58 @@ int main_initialize()
     #if __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Timelapse", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, app_title(), nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
     gl3wInit();
+    
+    return window;
+}
 
-    // Setup Dear ImGui binding
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    ImGui_ImplGlfwGL3_Init(window, true);
+static void setup_main_window_icon(GLFWwindow* window)
+{
+    HWND window_handle = glfwGetWin32Window(window);
+    HINSTANCE module_handle = ::GetModuleHandle(nullptr);
+    HANDLE big_icon = LoadImageA(module_handle, MAKEINTRESOURCE(GLFW_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
+    HANDLE small_icon = LoadImageA(module_handle, MAKEINTRESOURCE(GLFW_ICON), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+    if (big_icon)
+        SendMessage(window_handle, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(big_icon));
+    if (small_icon)
+        SendMessage(window_handle, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(small_icon));
+}
 
-    // Setup style
-    //ImGui::StyleColorsDark();
-    ImGui::StyleColorsClassic();
-
-    memory_set_tracker(memory_tracker_local());
-
+extern int main_initialize()
+{
     // Use default values for foundation config
+    application_t application;
     foundation_config_t config;
     memset(&config, 0, sizeof config);
-
-    // Declare the application
-    application_t application;
     memset(&application, 0, sizeof application);
 
-    // Suppress debug messages
     log_set_suppress(0, ERRORLEVEL_DEBUG);
+    memory_set_tracker(memory_tracker_local());
 
-    tl::configure(config, application);
+    app_configure(config, application);
 
     int init_result = foundation_initialize(memory_system_malloc(), application, config);
     if (init_result)
         return init_result;
+
+    GLFWwindow* window = setup_main_window();
+    if (!window)
+        return ERROR_INTERNAL_FAILURE;
+
+    setup_main_window_icon(window);
+    setup_imgui(window);
     
-    return tl::initialize(window);
+    return app_initialize(window);
 }
 
-int main_run(void*)
+extern int main_run(void*)
 {
     const ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // Main loop
     while (!glfwWindowShouldClose(g_Window))
     {
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -565,35 +589,36 @@ int main_run(void*)
         // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
         // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
         glfwPollEvents();
-        ImGui_ImplGlfwGL3_NewFrame();
+        imgui_impl_glfw_gl3_new_frame();
 
         int display_w, display_h;
         glfwGetFramebufferSize(g_Window, &display_w, &display_h);
 
-        tl::render(display_w, display_h);
+        app_render(display_w, display_h);
 
         // Rendering
         glViewport(0, 0, display_w, display_h);
         glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui::Render();
-        ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+        imgui_impl_glfw_gl3_render_draw_data(ImGui::GetDrawData());
         glfwSwapBuffers(g_Window);
     }
 
     return 0;
 }
 
-void main_finalize()
+extern void main_finalize()
 {
-    tl::shutdown();
+    app_shutdown();
 
-    // Cleanup
-    ImGui_ImplGlfwGL3_Shutdown();
+    imgui_impl_glfw_gl3_shutdown();
     ImGui::DestroyContext();
 
     glfwDestroyWindow(g_Window);
+    g_Window = nullptr;
+
     glfwTerminate();
 
-    g_Window = nullptr;
+    foundation_finalize();
 }

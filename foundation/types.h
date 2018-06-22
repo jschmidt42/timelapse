@@ -77,7 +77,7 @@ typedef enum {
 	expect or support */
 	ERROR_INTERNAL_FAILURE,
 	/*! The function call was not allowed */
-	_ERROR_ACCESS_DENIED,
+	ERROR_ACCESS_DENIED,
 	/*! An exception was thrown */
 	ERROR_EXCEPTION,
 	/*! A system call failed */
@@ -350,6 +350,7 @@ before function returns or scope ends) */
 /*! Event flag, event is delayed and will be delivered at a later timestamp */
 #define EVENTFLAG_DELAY 1U
 
+#define APPLICATION_STANDARD (0)
 /*! Application flag, application is a command line utility and should not have
 a normal windowing system interaction loop */
 #define APPLICATION_UTILITY (1U<<0)

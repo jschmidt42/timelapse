@@ -56,10 +56,6 @@ assets/
 *.user
 *.vc.db
 *.VC.db
-*.vcproj
-*.vcxproj
-*.vcxproj.filters
-*.xcodeproj
 *.xcworkspace
 *.vtcache
 *.old
@@ -88,6 +84,8 @@ make_args.txt
 # The visual studio debugger visualizer dll
 
 !/tools/visual_studio_plugins/*.dll
+
+!/external/
 
 # Wwise user files
 

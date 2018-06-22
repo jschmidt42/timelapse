@@ -5,13 +5,13 @@
     <ClInclude Include="../../timelapse/resource.h">
       <Filter>resources</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\stb\stb_textedit.h">
+    <ClInclude Include="..\..\external\stb\stb_textedit.h">
       <Filter>external\stb</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\stb\stb_truetype.h">
+    <ClInclude Include="..\..\external\stb\stb_truetype.h">
       <Filter>external\stb</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\stb\stb_rect_pack.h">
+    <ClInclude Include="..\..\external\stb\stb_rect_pack.h">
       <Filter>external\stb</Filter>
     </ClInclude>
     <ClInclude Include="..\..\imgui\imgui_internal.h">
@@ -23,16 +23,16 @@
     <ClInclude Include="..\..\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gl3w\GL\glcorearb.h">
+    <ClInclude Include="..\..\external\gl3w\GL\glcorearb.h">
       <Filter>external\gl3w</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\gl3w\GL\gl3w.h">
+    <ClInclude Include="..\..\external\gl3w\GL\gl3w.h">
       <Filter>external\gl3w</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\glfw\include\GLFW\glfw3.h">
+    <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3.h">
       <Filter>external\glfw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\glfw\include\GLFW\glfw3native.h">
+    <ClInclude Include="..\..\external\glfw\include\GLFW\glfw3native.h">
       <Filter>external\glfw</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
@@ -51,7 +51,7 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\timelapse\main.cpp" />
-    <ClCompile Include="..\..\gl3w\GL\gl3w.c">
+    <ClCompile Include="..\..\external\gl3w\GL\gl3w.c">
       <Filter>external\gl3w</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">

@@ -30,6 +30,22 @@ void cleanup()
     string_deallocate(g_working_dir.str);
 }
 
+static void cancel_pending_requests()
+{
+    if (g_request_fetch_revisions != 0)
+        g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
+
+    if (g_request_fetch_single_revision != 0)
+        g_request_fetch_single_revision = scm::dispose_request(g_request_fetch_single_revision);
+}
+
+static void clear_revisions_info()
+{
+    g_revisions.clear();
+    g_revision_cursor = -1;
+    g_last_fetched_revid_annotations = 0;
+}
+
 void setup(const char* file_path)
 {
     // setup can be called multiple times, so cleaning up first.
@@ -45,16 +61,17 @@ void setup(const char* file_path)
         g_file_path = string_clone_string(string_empty());
         g_working_dir =  string_clone_string(environment_current_working_directory());
     }
+
+    if (is_valid())
+    {
+        cancel_pending_requests();
+        clear_revisions_info();
+    }
 }
 
 void shutdown()
 {
-    if (g_request_fetch_revisions != 0)
-        scm::dispose_request(g_request_fetch_revisions);
-
-    if (g_request_fetch_single_revision != 0)
-        scm::dispose_request(g_request_fetch_single_revision);
-
+    cancel_pending_requests();
     cleanup();
 }
 

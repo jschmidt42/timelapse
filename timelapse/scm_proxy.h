@@ -31,7 +31,7 @@ struct annotations_t
 std::string execute_command(const char* cmd, const char* working_directory);
 
 /// Fetch scm revision for a given file in another thread.
-request_t fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges, int last_count);
+request_t fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges);
 
 /// Check if the scm command has finished.
 bool is_request_done(request_t request);

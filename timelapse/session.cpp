@@ -58,9 +58,9 @@ void shutdown()
     cleanup();
 }
 
-bool fetch_revisions(int last_count)
+bool fetch_revisions()
 {
-    g_request_fetch_revisions = scm::fetch_revisions(file_path(), working_dir(), false, last_count);
+    g_request_fetch_revisions = scm::fetch_revisions(file_path(), working_dir(), false);
     return g_request_fetch_revisions != 0;
 }
 
@@ -87,13 +87,7 @@ void update()
             g_revisions = scm::revision_list(result, g_revisions);
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
-            set_revision_cursor((g_revision_cursor+1) + (g_revisions.size() - revision_count_before) - 1);
-
-            if (revision_count_before < g_revisions.size())
-            {
-                // There is more, so fetch some more
-                fetch_revisions(int(g_revisions.size() * 2.2f));
-            }
+            set_revision_cursor((g_revision_cursor + 1) + (g_revisions.size() - revision_count_before) - 1);
         }
     }
 

@@ -103,14 +103,14 @@ std::string timelapse::scm::execute_command(const char* cmd, const char* working
     return strResult;
 }
 
-timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges, int last_count)
+timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)
 {
     command_t* cmd = (command_t*)memory_allocate(HASH_SCM, sizeof command_t, 0, 0);
-    cmd->context = last_count;
+    cmd->context = 0;
     cmd->file = string_clone(file_path, strlen(file_path));
     cmd->line = string_allocate_format(STRING_CONST(
-        "hg log --template \"{rev}|{author|user}|{node|short}|{date | shortdate}|{desc | strip | firstline}\\n\" " \
-        "%s -l %d \"%s\""), wants_merges ? "" : "--no-merges", last_count, file_path);
+        "hg log --template \"{rev}|{author|user}|{node|short}|{date|shortdate}|{desc|strip|firstline}\\n\" " \
+        "-r \"ancestors(branch(.))\" %s \"%s\""), wants_merges ? "" : "--no-merges", file_path);
     cmd->dir = string_clone(working_dir, strlen(working_dir));
 
     cmd->thread = thread_allocate(execute_request, cmd, STRING_CONST("scm request"), THREAD_PRIORITY_HIGHEST, 0);

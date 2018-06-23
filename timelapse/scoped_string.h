@@ -9,6 +9,11 @@ struct scoped_string_t
     {
     }
 
+    scoped_string_t(const string_const_t& s)
+        : value(string_clone(s.str, s.length))
+    {
+    }
+
     scoped_string_t(string_t&& o)
     {
         value.str = o.str;

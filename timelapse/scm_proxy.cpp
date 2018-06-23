@@ -133,7 +133,7 @@ size_t timelapse::scm::dispose_request(request_t request)
     command_t* cmd = (command_t*)request;
 
     if (thread_is_running(cmd->thread))
-        beacon_try_wait(&cmd->thread->beacon, 3000);
+        beacon_try_wait(&cmd->thread->beacon, 500);
 
     thread_deallocate(cmd->thread);
     string_deallocate(cmd->line.str);

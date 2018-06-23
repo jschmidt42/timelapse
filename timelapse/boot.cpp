@@ -506,7 +506,7 @@ static void setup_imgui(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.WantSaveIniSettings = false;
+    //io.WantSaveIniSettings = false;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     imgui_impl_glfw_gl3_init(window, true);
 

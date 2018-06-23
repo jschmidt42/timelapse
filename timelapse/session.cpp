@@ -49,6 +49,12 @@ void setup(const char* file_path)
 
 void shutdown()
 {
+    if (g_request_fetch_revisions != 0)
+        scm::dispose_request(g_request_fetch_revisions);
+
+    if (g_request_fetch_single_revision != 0)
+        scm::dispose_request(g_request_fetch_single_revision);
+
     cleanup();
 }
 

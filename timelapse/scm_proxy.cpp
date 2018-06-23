@@ -1,4 +1,5 @@
 #include "scm_proxy.h"
+#include "scoped_string.h"
 
 #include "foundation/windows.h"
 #undef THREAD_PRIORITY_HIGHEST
@@ -18,21 +19,28 @@
 
 struct command_t
 {
-    int context;
-    string_t line;
-    string_t file;
-    string_t dir;
+    int context{};
+    string_t line{};
+    string_t file{};
+    string_t dir{};
 
-    thread_t* thread;
+    thread_t* thread{};
+    string_t (*transform)(const string_t&, const char*){};
 
-    string_t result;
+    string_t result{};
 };
 
 static void* execute_request(void *arg)
 {
     command_t* cmd = (command_t*)arg;
     std::string output = timelapse::scm::execute_command(cmd->line.str, cmd->dir.str);
-    cmd->result = string_clone(output.c_str(), output.size());
+    scoped_string_t result = string_clone(output.c_str(), output.size());
+
+    if (cmd->transform)
+        cmd->result = cmd->transform(result.value, cmd->dir.str);
+    else
+        cmd->result = string_clone(STRING_ARGS(result.value));
+
     return 0;
 }
 
@@ -103,15 +111,64 @@ std::string timelapse::scm::execute_command(const char* cmd, const char* working
     return strResult;
 }
 
+static size_t string_occurence(const char* str, size_t len, char c)
+{
+    size_t occurence = 0;
+    size_t offset = 0;
+    while (true)
+    {
+        offset = string_find(str, len, c, offset);
+        if (offset == STRING_NPOS)
+            break;
+        offset++;
+        occurence++;
+    }
+    return occurence;
+}
+
 timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)
 {
     command_t* cmd = (command_t*)memory_allocate(HASH_SCM, sizeof command_t, 0, 0);
     cmd->context = 0;
+
     cmd->file = string_clone(file_path, strlen(file_path));
     cmd->line = string_allocate_format(STRING_CONST(
-        "hg log --template \"{rev}|{author|user}|{node|short}|{date|shortdate}|{desc|strip|firstline}\\n\" " \
+        "hg log --template \"{rev}|{author|user}|{node|short}|{date|shortdate}|{date}|{branch}|{desc|strip|firstline}\\n\" " \
         "-r \"ancestors(branch(.))\" %s \"%s\""), wants_merges ? "" : "--no-merges", file_path);
     cmd->dir = string_clone(working_dir, strlen(working_dir));
+
+    cmd->transform = [](const string_t& output, const char* working_dir)
+    {
+        scoped_string_t result = string_allocate(0, output.length);
+        size_t line_occurence = string_occurence(STRING_ARGS(output), STRING_NEWLINE[0]);
+        string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
+        size_t change_count = string_explode(STRING_ARGS(output), STRING_CONST("\n"), changes, line_occurence, false);
+        for (size_t i = 0; i < change_count; ++i)
+        {
+            string_const_t infos[8];
+            string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
+
+            revision_t r;
+            r.id = string_to_int(STRING_ARGS(infos[0]));
+            r.author.assign(infos[1].str, infos[1].length);
+            r.rev.assign(infos[2].str, infos[2].length);
+            r.date.assign(infos[3].str, infos[3].length);
+            r.rawdate.assign(infos[4].str, infos[4].length);
+            r.branch.assign(infos[5].str, infos[5].length);
+            r.description.assign(infos[6].str, infos[6].length);
+
+            scoped_string_t get_trunk_based_cmd = string_allocate_format(STRING_CONST("hg log --template \"{date}\" -r \"min(descendants(%d) and branch(.))\""), r.id);
+            std::string trunk_based_date = execute_command((const char*)get_trunk_based_cmd, working_dir);
+
+            scoped_string_t with_new_info = string_allocate_format(STRING_CONST("%d|%s|%s|%s|%s|%s|%s\n"),
+                r.id, r.author.c_str(), r.rev.c_str(), r.date.c_str(), trunk_based_date.c_str(), r.branch.c_str(), r.description.c_str());
+
+            result = string_allocate_concat(STRING_ARGS(result.value), STRING_ARGS(with_new_info.value));
+        }
+        memory_deallocate(changes);
+
+        return string_clone(STRING_ARGS(result.value));
+    };
 
     cmd->thread = thread_allocate(execute_request, cmd, STRING_CONST("scm request"), THREAD_PRIORITY_HIGHEST, 0);
     thread_start(cmd->thread);
@@ -156,8 +213,10 @@ string_t timelapse::scm::request_result(request_t request)
 
 std::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result, const std::vector<timelapse::scm::revision_t>& previous_revisions)
 {
-    string_const_t changes[100];
-    size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, SCM_ARRAYSIZE(changes), false);
+    size_t line_occurence = string_occurence(STRING_ARGS(result), STRING_NEWLINE[0]);
+    
+    string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
+    size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, line_occurence, false);
 
     std::vector<revision_t> revisions;
 
@@ -171,7 +230,9 @@ std::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const stri
         r.author.assign(infos[1].str, infos[1].length);
         r.rev.assign(infos[2].str, infos[2].length);
         r.date.assign(infos[3].str, infos[3].length);
-        r.description.assign(infos[4].str, infos[4].length);
+        r.rawdate.assign(infos[4].str, infos[4].length);
+        r.branch.assign(infos[5].str, infos[5].length);
+        r.description.assign(infos[6].str, infos[6].length);
 
         const auto& fit = std::find_if(previous_revisions.begin(), previous_revisions.end(), [&r](const revision_t& o) { return r.id == o.id; });
         if (fit != previous_revisions.end())
@@ -182,7 +243,9 @@ std::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const stri
         revisions.push_back(r);
     }
 
-    std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return a.id < b.id; });
+    memory_deallocate(changes);
+
+    std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return a.rawdate < b.rawdate; });
 
     return revisions;
 }
@@ -191,6 +254,7 @@ timelapse::scm::request_t timelapse::scm::fetch_revision_annotations(const char*
 {
     command_t* cmd = (command_t*)memory_allocate(HASH_SCM, sizeof command_t, 0, 0);
     cmd->context = revid;
+    cmd->transform = nullptr;
     cmd->file = string_clone(file_path, strlen(file_path));
     cmd->line = string_allocate_format(STRING_CONST("hg annotate --user -c -w -b -B -r %d \"%s\""), revid, file_path);
     cmd->dir = string_clone(working_dir, strlen(working_dir));

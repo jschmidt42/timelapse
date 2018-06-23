@@ -16,10 +16,19 @@ struct scoped_string_t
 
     scoped_string_t(string_t&& o)
     {
+        string_t temp = value;
         value.str = o.str;
         value.length = o.length;
-        o.str = nullptr;
-        o.length = 0;
+        string_deallocate(temp.str);
+    }
+
+    scoped_string_t& operator=(string_t&& o)
+    {
+        string_t temp = value;
+        value.str = o.str;
+        value.length = o.length;
+        string_deallocate(temp.str);
+        return *this;
     }
 
     scoped_string_t(const scoped_string_t& other)

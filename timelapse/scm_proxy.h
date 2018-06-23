@@ -15,7 +15,9 @@ struct revision_t
 
     std::string rev{};
     std::string author{};
+    std::string branch{};
     std::string date{};
+    std::string rawdate{};
     std::string description{};
 
     std::string annotations{};

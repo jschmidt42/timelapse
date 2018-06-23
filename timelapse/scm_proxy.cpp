@@ -18,7 +18,9 @@
 
 struct command_t
 {
+    int context;
     string_t line;
+    string_t file;
     string_t dir;
 
     thread_t* thread;
@@ -104,9 +106,10 @@ std::string timelapse::scm::execute_command(const char* cmd, const char* working
 timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges, int last_count)
 {
     command_t* cmd = (command_t*)memory_allocate(HASH_SCM, sizeof command_t, 0, 0);
+    cmd->context = last_count;
+    cmd->file = string_clone(file_path, strlen(file_path));
     cmd->line = string_allocate_format(STRING_CONST(
-        "hg log --template \"{rev}|{author|user}|{node|short}|" \
-        "{date | shortdate}|{count(file_mods)}|{desc | strip | firstline}\\n\" " \
+        "hg log --template \"{rev}|{author|user}|{node|short}|{date | shortdate}|{desc | strip | firstline}\\n\" " \
         "%s -l %d \"%s\""), wants_merges ? "" : "--no-merges", last_count, file_path);
     cmd->dir = string_clone(working_dir, strlen(working_dir));
 
@@ -135,6 +138,7 @@ size_t timelapse::scm::dispose_request(request_t request)
     thread_deallocate(cmd->thread);
     string_deallocate(cmd->line.str);
     string_deallocate(cmd->dir.str);
+    string_deallocate(cmd->file.str);
     string_deallocate(cmd->result.str);
     memory_deallocate(cmd);
 
@@ -150,33 +154,68 @@ string_t timelapse::scm::request_result(request_t request)
     return string_clone(STRING_ARGS(cmd->result));
 }
 
-std::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result)
+std::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result, const std::vector<timelapse::scm::revision_t>& previous_revisions)
 {
     string_const_t changes[100];
     size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, SCM_ARRAYSIZE(changes), false);
 
-    std::vector<timelapse::scm::revision_t> revisions;
+    std::vector<revision_t> revisions;
 
     for (size_t i = 0; i < change_count; ++i)
     {
         string_const_t infos[16];
         string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
 
-        timelapse::scm::revision_t r;
+        revision_t r;
         r.id = string_to_int(STRING_ARGS(infos[0]));
         r.author.assign(infos[1].str, infos[1].length);
         r.rev.assign(infos[2].str, infos[2].length);
         r.date.assign(infos[3].str, infos[3].length);
-        r.mods = string_to_int(STRING_ARGS(infos[4]));
-        r.description.assign(infos[5].str, infos[5].length);
+        r.description.assign(infos[4].str, infos[4].length);
+
+        const auto& fit = std::find_if(previous_revisions.begin(), previous_revisions.end(), [&r](const revision_t& o) { return r.id == o.id; });
+        if (fit != previous_revisions.end())
+        {
+            r.annotations = fit->annotations;
+        }
 
         revisions.push_back(r);
     }
 
-    std::sort(revisions.begin(), revisions.end(), [](const timelapse::scm::revision_t& a, const timelapse::scm::revision_t& b)
-    {
-        return a.id < b.id;
-    });
+    std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return a.id < b.id; });
 
     return revisions;
+}
+
+timelapse::scm::request_t timelapse::scm::fetch_revision_annotations(const char* file_path, const char* working_dir, int revid)
+{
+    command_t* cmd = (command_t*)memory_allocate(HASH_SCM, sizeof command_t, 0, 0);
+    cmd->context = revid;
+    cmd->file = string_clone(file_path, strlen(file_path));
+    cmd->line = string_allocate_format(STRING_CONST("hg annotate --user -c -w -b -B -r %d \"%s\""), revid, file_path);
+    cmd->dir = string_clone(working_dir, strlen(working_dir));
+
+    cmd->thread = thread_allocate(execute_request, cmd, STRING_CONST("scm annotate"), THREAD_PRIORITY_HIGHEST, 0);
+    thread_start(cmd->thread);
+
+    return (request_t)cmd;
+}
+
+timelapse::scm::annotations_t timelapse::scm::revision_annotations(request_t request)
+{
+    annotations_t ann;
+    ann.revid = 0;
+    ann.file = "";
+    ann.source = "";
+
+    if (!is_request_done(request))
+        return ann;
+
+    command_t* cmd = (command_t*)request;
+
+    ann.revid = cmd->context;
+    ann.file.assign(cmd->file.str, cmd->file.length);
+    ann.source.assign(cmd->result.str, cmd->result.length);
+    
+    return ann;
 }

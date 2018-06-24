@@ -1,9 +1,9 @@
-#include "foundation/windows.h"
-#undef THREAD_PRIORITY_HIGHEST
-
 #include "scm_proxy.h"
 #include "scoped_string.h"
 #include "common.h"
+
+#include "foundation/windows.h"
+#undef THREAD_PRIORITY_HIGHEST
 
 #include "foundation/environment.h"
 #include "foundation/string.h"
@@ -13,7 +13,6 @@
 #include "foundation/beacon.h"
 
 #include <algorithm> // REMOVE ME
-#include <string> // REMOVE ME
 
 #define SCM_ARRAYSIZE(_ARR) ((size_t)(sizeof(_ARR)/sizeof(*(_ARR))))
 #define HASH_SCM (static_hash_string("scm", 3, 3754008690416994104ULL))
@@ -31,9 +30,8 @@ struct command_t
     string_t result{};
 };
 
-static std::string execute_command(const char* cmd, const char* working_directory)
+static string_t execute_command(const char* cmd, const char* working_directory)
 {
-    std::string strResult;
     HANDLE hPipeRead, hPipeWrite;
 
     SECURITY_ATTRIBUTES saAttr = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
@@ -42,7 +40,7 @@ static std::string execute_command(const char* cmd, const char* working_director
 
     // Create a pipe to get results from child's stdout.
     if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0))
-        return strResult;
+        return {0, 0};
 
     STARTUPINFOA si;
     ZeroMemory(&si, sizeof(si));
@@ -60,9 +58,10 @@ static std::string execute_command(const char* cmd, const char* working_director
     {
         CloseHandle(hPipeWrite);
         CloseHandle(hPipeRead);
-        return strResult;
+        return {0, 0};
     }
 
+    string_t strResult = string_allocate(0, 1024);
     bool bProcessEnded = false;
     for (; !bProcessEnded;)
     {
@@ -82,12 +81,15 @@ static std::string execute_command(const char* cmd, const char* working_director
             if (!dwAvail) // no data available, return
                 break;
 
-            if (!::ReadFile(hPipeRead, buf, (DWORD)min(sizeof(buf) - 1, (size_t)dwAvail), &dwRead, nullptr) || !dwRead)
+            if (!::ReadFile(hPipeRead, buf, (DWORD)generics::min(sizeof(buf) - 1, (size_t)dwAvail), &dwRead, nullptr) || !dwRead)
                 // error, the child process might ended
                 break;
 
             buf[dwRead] = 0;
-            strResult += buf;
+
+            string_t temp = strResult;
+            strResult = string_allocate_concat(STRING_ARGS(strResult), buf, dwRead-1);
+            string_deallocate(temp.str);
         }
     }
 
@@ -101,13 +103,12 @@ static std::string execute_command(const char* cmd, const char* working_director
 static void* execute_request(void *arg)
 {
     command_t* cmd = (command_t*)arg;
-    std::string output = execute_command(cmd->line.str, cmd->dir.str);
-    scoped_string_t result = string_clone(output.c_str(), output.size());
+    scoped_string_t output = execute_command(cmd->line.str, cmd->dir.str);
 
     if (cmd->transform)
-        cmd->result = cmd->transform(result.value, cmd->dir.str);
+        cmd->result = cmd->transform(output.value, cmd->dir.str);
     else
-        cmd->result = string_clone(STRING_ARGS(result.value));
+        cmd->result = string_clone(STRING_ARGS(output.value));
 
     return 0;
 }
@@ -221,8 +222,7 @@ string_t timelapse::scm::request_result(request_t request)
 
 generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result)
 {
-    size_t line_occurence = string_occurence(STRING_ARGS(result), STRING_NEWLINE[0]);
-    
+    const size_t line_occurence = string_occurence(STRING_ARGS(result), STRING_NEWLINE[0]);
     string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
     size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, line_occurence, false);
 

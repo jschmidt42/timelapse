@@ -3,14 +3,6 @@
 #include "foundation/assert.h"
 #include "foundation/memory.h"
 
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
-#ifndef min
-#define min(a,b)            (((a) < (b)) ? (a) : (b))
-#endif
-
 template <class T>
 int num_digits(T number)
 {
@@ -26,6 +18,9 @@ int num_digits(T number)
 size_t string_occurence(const char* str, size_t len, char c);
 
 namespace generics {
+
+    template<typename T> T min(T a, T b) { return (((a) < (b)) ? (a) : (b)); }
+    template<typename T> T max(T a, T b) { return (((a) > (b)) ? (a) : (b)); }
 
     template<typename T>
     class vector

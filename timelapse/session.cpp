@@ -175,7 +175,7 @@ int is_fetching_annotations()
 size_t set_revision_cursor(size_t revision)
 {
     if (!g_revisions.empty())
-        g_revision_cursor = max(0ULL, min((size_t)revision, g_revisions.size()-1ULL));
+        g_revision_cursor = generics::max(0ULL, generics::min((size_t)revision, g_revisions.size()-1ULL));
     else
         g_revision_cursor = -1;
     return g_revision_cursor;

@@ -151,7 +151,7 @@ static void* execute_cmd_line_request(void *arg)
 
     array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
 
-//     const size_t line_occurence = string_occurence(STRING_ARGS(crev.annotations), STRING_NEWLINE[0]);
+//     const size_t line_occurence = string_line_count(STRING_ARGS(crev.annotations), STRING_NEWLINE[0]);
 //     string_const_t* lines = (string_const_t*)memory_allocate(HASH_TIMELAPSE, line_occurence * sizeof string_const_t, 0, 0);
 //     size_t line_count = string_explode(STRING_ARGS(crev.annotations), STRING_CONST("\n"), lines, line_occurence, false);
 // 
@@ -165,7 +165,7 @@ static void* execute_cmd_line_request(void *arg)
 //     }
 // 
 //     scoped_string_t result = string_allocate(0, output.length);
-//     size_t line_occurence = string_occurence(STRING_ARGS(output), STRING_NEWLINE[0]);
+//     size_t line_occurence = string_line_count(STRING_ARGS(output), STRING_NEWLINE[0]);
 //     string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
 //     size_t change_count = string_explode(STRING_ARGS(output), STRING_CONST("\n"), changes, line_occurence, false);
 // 
@@ -300,9 +300,9 @@ string_t* timelapse::scm::request_results(request_t request)
 
 generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result)
 {
-    const size_t line_occurence = string_occurence(STRING_ARGS(result), STRING_NEWLINE[0]);
+    const size_t line_occurence = string_line_count(STRING_ARGS(result));
     string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
-    size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, line_occurence, false);
+    size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, line_occurence, true);
 
     generics::vector<revision_t> revisions;
 

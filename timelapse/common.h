@@ -16,6 +16,7 @@ int num_digits(T number)
 }
 
 size_t string_occurence(const char* str, size_t len, char c);
+size_t string_line_count(const char* str, size_t len);
 
 namespace generics {
 

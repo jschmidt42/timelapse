@@ -226,6 +226,9 @@
     <ClInclude Include="..\..\timelapse\scoped_string.h">
       <Filter>timelapse</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\timelapse\common.h">
+      <Filter>framework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\imgui\imgui.cpp">
@@ -389,6 +392,9 @@
     </ClCompile>
     <ClCompile Include="..\..\timelapse\session.cpp">
       <Filter>timelapse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\timelapse\common.cpp">
+      <Filter>framework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

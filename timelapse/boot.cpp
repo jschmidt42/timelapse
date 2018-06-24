@@ -15,7 +15,6 @@
 
 #pragma comment( lib, "glfw3.lib" )
 #pragma comment( lib, "opengl32.lib" )
-#pragma comment( lib, "legacy_stdio_definitions.lib" )
 
 // Application specific routines
 extern void app_configure(foundation_config_t& config, application_t& application);
@@ -508,13 +507,13 @@ static void setup_imgui(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    //io.WantSaveIniSettings = false;
+    io.WantSaveIniSettings = false;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
     imgui_impl_glfw_gl3_init(window, true);
 
     // Setup style
-    //ImGui::StyleColorsDark();
-    ImGui::StyleColorsClassic();
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
 }
 
 static GLFWwindow* setup_main_window()
@@ -561,7 +560,9 @@ extern int main_initialize()
     memset(&config, 0, sizeof config);
     memset(&application, 0, sizeof application);
 
+    #ifdef _DEBUG
     log_set_suppress(0, ERRORLEVEL_DEBUG);
+    #endif
     memory_set_tracker(memory_tracker_local());
 
     app_configure(config, application);

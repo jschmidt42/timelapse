@@ -169,6 +169,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\timelapse\common.cpp" />
     <ClCompile Include="..\..\timelapse\scm_proxy.cpp" />
     <ClCompile Include="..\..\timelapse\session.cpp" />
     <ClInclude Include="..\..\external\gl3w\GL\gl3w.h" />
@@ -304,6 +305,7 @@
     <ClInclude Include="../../timelapse/resource.h" />
     <ClInclude Include="../../timelapse/timelapse.h" />
     <ClCompile Include="../../timelapse/timelapse.cpp" />
+    <ClInclude Include="..\..\timelapse\common.h" />
     <ClInclude Include="..\..\timelapse\scm_proxy.h" />
     <ClInclude Include="..\..\timelapse\scoped_string.h" />
     <ClInclude Include="..\..\timelapse\session.h" />

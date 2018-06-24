@@ -1,5 +1,6 @@
 #include "scm_proxy.h"
 #include "scoped_string.h"
+#include "common.h"
 
 #include "foundation/windows.h"
 #undef THREAD_PRIORITY_HIGHEST
@@ -109,21 +110,6 @@ std::string timelapse::scm::execute_command(const char* cmd, const char* working
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     return strResult;
-}
-
-static size_t string_occurence(const char* str, size_t len, char c)
-{
-    size_t occurence = 0;
-    size_t offset = 0;
-    while (true)
-    {
-        offset = string_find(str, len, c, offset);
-        if (offset == STRING_NPOS)
-            break;
-        offset++;
-        occurence++;
-    }
-    return occurence;
 }
 
 timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)

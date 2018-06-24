@@ -1,13 +1,12 @@
 #include "session.h"
 #include "scm_proxy.h"
 #include "scoped_string.h"
+#include "common.h"
 
 #include "foundation/environment.h"
 #include "foundation/path.h"
 #include "foundation/string.h"
 #include "foundation/foundation.h"
-
-#include <algorithm>//REMOVE ME
 
 namespace timelapse { namespace session {
 
@@ -21,7 +20,7 @@ scm::request_t g_request_fetch_single_revision = 0;
 
 // Fetch revision data
 size_t g_revision_cursor = -1;
-std::vector<scm::revision_t> g_revisions;
+generics::vector<scm::revision_t> g_revisions;
 int g_last_fetched_revid_annotations = 0;
 
 void cleanup()
@@ -41,6 +40,8 @@ static void cancel_pending_requests()
 
 static void clear_revisions_info()
 {
+    for (auto& rev: g_revisions)
+        scm::revision_deallocate(rev);
     g_revisions.clear();
     g_revision_cursor = -1;
     g_last_fetched_revid_annotations = 0;
@@ -72,6 +73,7 @@ void setup(const char* file_path)
 void shutdown()
 {
     cancel_pending_requests();
+    clear_revisions_info();
     cleanup();
 }
 
@@ -101,7 +103,7 @@ void update()
             size_t revision_count_before = g_revisions.size();
 
             scoped_string_t result = scm::request_result(g_request_fetch_revisions);
-            g_revisions = scm::revision_list(result, g_revisions);
+            g_revisions = scm::revision_list(result);
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
             set_revision_cursor((g_revision_cursor + 1) + (g_revisions.size() - revision_count_before) - 1);
@@ -113,7 +115,7 @@ void update()
         if (g_revision_cursor < g_revisions.size())
         {
             const auto& crev = g_revisions[g_revision_cursor];
-            if (crev.annotations.empty())
+            if (crev.annotations.length == 0)
             {
                 g_last_fetched_revid_annotations = crev.id;
                 g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), crev.id);
@@ -123,12 +125,13 @@ void update()
         if (g_request_fetch_single_revision == 0)
         {
             // Fetch extra info for individual revisions
-            for (auto rit = g_revisions.rbegin(), rend = g_revisions.rend(); rit != rend; ++rit)
+            for (size_t i = g_revisions.size()-1; i != -1; --i)
             {
-                if (rit->annotations.empty())
+                auto& rev = g_revisions[i];
+                if (rev.annotations.length == 0)
                 {
-                    g_last_fetched_revid_annotations = rit->id;
-                    g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), rit->id);
+                    g_last_fetched_revid_annotations = rev.id;
+                    g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), rev.id);
                     break;
                 }
             }
@@ -136,10 +139,17 @@ void update()
     }
     else if (g_request_fetch_single_revision != 0 && scm::is_request_done(g_request_fetch_single_revision))
     {
-        const scm::annotations_t& annotations = scm::revision_annotations(g_request_fetch_single_revision);
-        const auto& fit = std::find_if(g_revisions.begin(), g_revisions.end(), [&annotations](const scm::revision_t& o) { return annotations.revid == o.id; });
-        if (fit != g_revisions.end())
-            fit->annotations = annotations.source;
+        scm::annotations_t annotations = scm::revision_annotations(g_request_fetch_single_revision);
+        for(auto& rev: g_revisions)
+        {
+            if (annotations.revid == rev.id)
+            {
+                rev.annotations = string_clone(STRING_ARGS(annotations.source));
+                break;
+            }
+        }
+        string_deallocate(annotations.file.str);
+        string_deallocate(annotations.source.str);
         g_request_fetch_single_revision = scm::dispose_request(g_request_fetch_single_revision);
     }
 }
@@ -149,7 +159,7 @@ size_t revision_curosr()
     return g_revision_cursor;
 }
 
-const std::vector<scm::revision_t>& revisions()
+const generics::vector<scm::revision_t>& revisions()
 {
     return g_revisions;
 }
@@ -165,7 +175,7 @@ int is_fetching_annotations()
 size_t set_revision_cursor(size_t revision)
 {
     if (!g_revisions.empty())
-        g_revision_cursor = std::max(0ULL, std::min((size_t)revision, g_revisions.size()-1ULL));
+        g_revision_cursor = max(0ULL, min((size_t)revision, g_revisions.size()-1ULL));
     else
         g_revision_cursor = -1;
     return g_revision_cursor;

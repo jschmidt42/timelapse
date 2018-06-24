@@ -2,8 +2,6 @@
 
 #include "scm_proxy.h"
 
-#include <vector> //REMOVE ME
-
 namespace timelapse { namespace session {
   
     void setup(const char* file_path = nullptr);
@@ -18,7 +16,7 @@ namespace timelapse { namespace session {
     void update();
     size_t revision_curosr();
     size_t set_revision_cursor(size_t revision);
-    const std::vector<scm::revision_t>& revisions();
+    const generics::vector<scm::revision_t>& revisions();
     int is_fetching_annotations();
 
 }}

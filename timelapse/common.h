@@ -3,6 +3,18 @@
 #include "foundation/assert.h"
 #include "foundation/memory.h"
 
+struct lines_t
+{
+    size_t count{};
+    string_const_t* items{};
+
+    const string_const_t& operator[](size_t index)
+    {
+        FOUNDATION_ASSERT(index < count);
+        return items[index];
+    }
+};
+
 template <class T>
 int num_digits(T number)
 {
@@ -17,6 +29,8 @@ int num_digits(T number)
 
 size_t string_occurence(const char* str, size_t len, char c);
 size_t string_line_count(const char* str, size_t len);
+lines_t string_split_lines(const char* str, size_t len);
+void string_lines_finalize(lines_t& lines);
 
 namespace generics {
 

@@ -148,47 +148,11 @@ static void* execute_cmd_line_request(void *arg)
 {
     command_t* cmd = (command_t*)arg;
     scoped_string_t output = execute_command(cmd->line.str, cmd->dir.str);
-
-    array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
-
-//     const size_t line_occurence = string_line_count(STRING_ARGS(crev.annotations), STRING_NEWLINE[0]);
-//     string_const_t* lines = (string_const_t*)memory_allocate(HASH_TIMELAPSE, line_occurence * sizeof string_const_t, 0, 0);
-//     size_t line_count = string_explode(STRING_ARGS(crev.annotations), STRING_CONST("\n"), lines, line_occurence, false);
-// 
-//     for (int i = 0, max_line_digit_count = num_digits(line_count); i < line_count; ++i)
-//     {
-//         const auto pos = string_find_string(STRING_ARGS(lines[i]), STRING_ARGS(crev.rev), 0);
-//         if (pos != STRING_NPOS)
-//             ImGui::TextColored(ImColor(0.6f, 1.0f, 0.6f), "%0*d: %.*s", max_line_digit_count, i + 1, lines[i].length, lines[i].str);
-//         else
-//             ImGui::Text("%0*d: %.*s", max_line_digit_count, i + 1, lines[i].length, lines[i].str);
-//     }
-// 
-//     scoped_string_t result = string_allocate(0, output.length);
-//     size_t line_occurence = string_line_count(STRING_ARGS(output), STRING_NEWLINE[0]);
-//     string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
-//     size_t change_count = string_explode(STRING_ARGS(output), STRING_CONST("\n"), changes, line_occurence, false);
-// 
-//     for (size_t i = 0; i < change_count; ++i)
-//     {
-//         string_const_t infos[8];
-//         string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
-// 
-//         revision_t r;
-//         revision_initialize(r, infos);
-// 
-//         scoped_string_t get_trunk_based_cmd = string_allocate_format(STRING_CONST("hg log --template \"{date}\" -r \"min(descendants(%d) and branch(.))\""), r.id);
-//         std::string trunk_based_date = execute_command((const char*)get_trunk_based_cmd, working_dir);
-// 
-//         scoped_string_t with_new_info = string_allocate_format(STRING_CONST("%d|%s|%s|%s|%s|%s|%s\n"),
-//             r.id, r.author.c_str(), r.rev.c_str(), r.date.c_str(), trunk_based_date.c_str(), r.branch.c_str(), r.description.c_str());
-// 
-//         result = string_allocate_concat(STRING_ARGS(result.value), STRING_ARGS(with_new_info.value));
-// 
-//         revision_deallocate(r);
-//     }
-//     memory_deallocate(changes);
-
+    
+    lines_t lines = string_split_lines(STRING_ARGS(output.value));
+    for (size_t i = 0; i < lines.count; ++i)
+        array_push(cmd->results, string_clone(STRING_ARGS(lines[i])));
+    string_lines_finalize(lines);
 
     return 0;
 }
@@ -289,7 +253,7 @@ size_t timelapse::scm::dispose_request(request_t request)
     return 0;
 }
 
-string_t* timelapse::scm::request_results(request_t request)
+const string_t* timelapse::scm::request_results(request_t request)
 {
     if (!is_request_done(request))
         return nullptr;
@@ -298,12 +262,8 @@ string_t* timelapse::scm::request_results(request_t request)
     return cmd->results;
 }
 
-generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t& result)
+generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const string_t* changes, size_t change_count)
 {
-    const size_t line_occurence = string_line_count(STRING_ARGS(result));
-    string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
-    size_t change_count = string_explode(STRING_ARGS(result), STRING_CONST("\n"), changes, line_occurence, true);
-
     generics::vector<revision_t> revisions;
 
     for (size_t i = 0; i < change_count; ++i)
@@ -315,8 +275,6 @@ generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const
         revision_initialize(r, infos);
         revisions.push_back(r);
     }
-
-    memory_deallocate(changes);
 
     std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return strcmp(a.rawdate.str, b.rawdate.str) < 0; });
 

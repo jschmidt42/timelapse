@@ -102,8 +102,8 @@ void update()
         {
             size_t revision_count_before = g_revisions.size();
 
-            string_t result = scm::request_results(g_request_fetch_revisions)[0];
-            g_revisions = scm::revision_list(result);
+            const string_t* results = scm::request_results(g_request_fetch_revisions);
+            g_revisions = scm::revision_list(results, array_size(results));
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
             set_revision_cursor((g_revision_cursor + 1) + (g_revisions.size() - revision_count_before) - 1);

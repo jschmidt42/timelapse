@@ -46,10 +46,10 @@ namespace timelapse { namespace scm {
     size_t dispose_request(request_t request);
 
     /// Returns the request result if done.
-    string_t* request_results(request_t request);
+    const string_t* request_results(request_t request);
 
     /// Parse the fetch revisions output and return the revision list container.
-    generics::vector<revision_t> revision_list(const string_t& result);
+    generics::vector<revision_t> revision_list(const string_t* changes, size_t change_count);
 
     /// Fetch additional info for a single revision
     request_t fetch_revision_annotations(const char* file_path, const char* working_dir, int revid);

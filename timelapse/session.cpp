@@ -1,12 +1,13 @@
 #include "session.h"
 #include "scm_proxy.h"
-#include "scoped_string.h"
 #include "common.h"
 
 #include "foundation/environment.h"
 #include "foundation/path.h"
 #include "foundation/string.h"
 #include "foundation/foundation.h"
+
+#include <algorithm>
 
 namespace timelapse { namespace session {
 
@@ -115,7 +116,7 @@ void update()
         if (g_revision_cursor < g_revisions.size())
         {
             const auto& crev = g_revisions[g_revision_cursor];
-            if (crev.annotations.length == 0)
+            if (array_size(crev.annotations) == 0)
             {
                 g_last_fetched_revid_annotations = crev.id;
                 g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), crev.id);
@@ -128,7 +129,7 @@ void update()
             for (size_t i = g_revisions.size()-1; i != -1; --i)
             {
                 auto& rev = g_revisions[i];
-                if (rev.annotations.length == 0)
+                if (array_size(rev.annotations) == 0)
                 {
                     g_last_fetched_revid_annotations = rev.id;
                     g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), rev.id);
@@ -145,12 +146,11 @@ void update()
         for(auto& rev: g_revisions)
         {
             if (annotations.revid == rev.id)
-            {
-                rev.annotations = string_clone(STRING_ARGS(annotations.source));
-                rev.patch = string_clone(STRING_ARGS(annotations.patch));
+            {                
+                std::swap(rev.patch, annotations.patch);
+                std::swap(rev.rawdate, annotations.date);
+                std::swap(rev.annotations, annotations.lines);
 
-                string_deallocate(rev.rawdate.str);
-                rev.rawdate = string_clone(STRING_ARGS(annotations.date));
                 break;
             }
         }

@@ -17,7 +17,7 @@ namespace timelapse { namespace scm {
         string_t rawdate{};
         string_t description{};
 
-        string_t annotations{};
+        string_t* annotations{};
         string_t patch{};
     };
 
@@ -29,7 +29,7 @@ namespace timelapse { namespace scm {
         int revid{};
         string_t file{};
         string_t date{};
-        string_t source{};
+        string_t* lines{};
         string_t patch{};
     };
 

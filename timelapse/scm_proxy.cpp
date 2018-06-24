@@ -189,8 +189,8 @@ void timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos)
     r.branch = string_clone_string(infos[5]);
     r.description = string_clone_string(infos[6]);
 
-    r.annotations = {0,0};
     r.patch = {0,0};
+    r.annotations = nullptr;
 }
 
 void timelapse::scm::revision_deallocate(revision_t& rev)
@@ -201,8 +201,9 @@ void timelapse::scm::revision_deallocate(revision_t& rev)
     string_deallocate(rev.date.str);
     string_deallocate(rev.rawdate.str);
     string_deallocate(rev.description.str);
-    string_deallocate(rev.annotations.str);
     string_deallocate(rev.patch.str);
+
+    string_array_deallocate(rev.annotations);
 }
 
 void timelapse::scm::annotations_initialize(annotations_t& ann)
@@ -210,16 +211,17 @@ void timelapse::scm::annotations_initialize(annotations_t& ann)
     ann.revid = 0;
     ann.file = { 0, 0 };
     ann.date = { 0, 0 };
-    ann.source = { 0, 0 };
     ann.patch = { 0, 0 };
+    ann.lines = nullptr;
 }
 
 void timelapse::scm::annotations_finailze(annotations_t& ann)
 {
     string_deallocate(ann.file.str);
     string_deallocate(ann.date.str);
-    string_deallocate(ann.source.str);
     string_deallocate(ann.patch.str);
+
+    string_array_deallocate(ann.lines);
 }
 
 timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)
@@ -299,10 +301,15 @@ timelapse::scm::annotations_t timelapse::scm::revision_annotations(request_t req
     auto* cmd = (command_t*)request;
 
     ann.revid = cmd->context;
+
     ann.file = string_clone(STRING_ARGS(cmd->file));
     ann.date = string_clone(STRING_ARGS(cmd->results[1]));
-    ann.source = string_clone(STRING_ARGS(cmd->results[0]));
     ann.patch = string_clone(STRING_ARGS(cmd->results[2]));
+
+    lines_t lines = string_split_lines(STRING_ARGS(cmd->results[0]));
+    for (size_t i = 0; i < lines.count; ++i)
+        array_push(ann.lines, string_clone(STRING_ARGS(lines[i])));
+    string_lines_finalize(lines);
     
     return ann;
 }

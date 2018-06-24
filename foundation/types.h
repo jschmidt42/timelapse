@@ -384,6 +384,8 @@ an error occurs during spawning */
 #define PROCESS_STDSTREAMS                 (1U<<2)
 /*! Process flag, use ShellExecute instead of CreateProcess (Windows platform only) */
 #define PROCESS_WINDOWS_USE_SHELLEXECUTE   (1U<<3)
+/*! Process flag, hide the exe window when spawed */
+#define PROCESS_HIDE_WINDOW                (1U<<3)
 /*! Process flag, use LSOpenApplication instead of fork/execve (macOS platform only) */
 #define PROCESS_MACOS_USE_OPENAPPLICATION (1U<<4)
 

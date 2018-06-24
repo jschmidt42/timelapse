@@ -18,5 +18,6 @@ namespace timelapse { namespace session {
     size_t set_revision_cursor(size_t revision);
     const generics::vector<scm::revision_t>& revisions();
     int is_fetching_annotations();
+    string_const_t rev_node();
 
 }}

@@ -172,6 +172,13 @@ int is_fetching_annotations()
     return g_last_fetched_revid_annotations;
 }
 
+string_const_t rev_node()
+{
+    if (g_revisions.empty())
+        return string_empty();
+    return string_to_const(g_revisions[g_revision_cursor].rev);
+}
+
 size_t set_revision_cursor(size_t revision)
 {
     if (!g_revisions.empty())

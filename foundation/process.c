@@ -238,7 +238,7 @@ process_spawn(process_t* proc) {
 		sei.lpFile          = wpath;
 		sei.lpParameters    = wcmdline;
 		sei.lpDirectory     = wwd;
-		sei.nShow           = SW_SHOWNORMAL;
+		sei.nShow           = (proc->flags & PROCESS_HIDE_WINDOW) ? SW_HIDE : SW_NORMAL;
 
 		if (!(proc->flags & PROCESS_CONSOLE))
 			sei.fMask      |= SEE_MASK_NO_CONSOLE;

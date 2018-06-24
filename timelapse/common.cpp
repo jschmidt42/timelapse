@@ -14,5 +14,5 @@ size_t string_occurence(const char* str, size_t len, char c)
         offset++;
         occurence++;
     }
-    return occurence;
+    return occurence+1;
 }

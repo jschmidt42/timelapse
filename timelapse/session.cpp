@@ -102,7 +102,7 @@ void update()
         {
             size_t revision_count_before = g_revisions.size();
 
-            scoped_string_t result = scm::request_result(g_request_fetch_revisions);
+            string_t result = scm::request_results(g_request_fetch_revisions)[0];
             g_revisions = scm::revision_list(result);
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
@@ -140,17 +140,22 @@ void update()
     else if (g_request_fetch_single_revision != 0 && scm::is_request_done(g_request_fetch_single_revision))
     {
         scm::annotations_t annotations = scm::revision_annotations(g_request_fetch_single_revision);
+        g_request_fetch_single_revision = scm::dispose_request(g_request_fetch_single_revision);
+
         for(auto& rev: g_revisions)
         {
             if (annotations.revid == rev.id)
             {
                 rev.annotations = string_clone(STRING_ARGS(annotations.source));
+                rev.patch = string_clone(STRING_ARGS(annotations.patch));
+
+                string_deallocate(rev.rawdate.str);
+                rev.rawdate = string_clone(STRING_ARGS(annotations.date));
                 break;
             }
         }
-        string_deallocate(annotations.file.str);
-        string_deallocate(annotations.source.str);
-        g_request_fetch_single_revision = scm::dispose_request(g_request_fetch_single_revision);
+
+        scm::annotations_finailze(annotations);
     }
 }
 

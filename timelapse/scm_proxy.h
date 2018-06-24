@@ -18,17 +18,23 @@ namespace timelapse { namespace scm {
         string_t description{};
 
         string_t annotations{};
+        string_t patch{};
     };
 
-    void revision_initialize(revision_t& rev, string_const_t* infos);
+    void revision_initialize(revision_t& r, string_const_t* infos);
     void revision_deallocate(revision_t& rev);
 
     struct annotations_t
     {
         int revid{};
         string_t file{};
+        string_t date{};
         string_t source{};
+        string_t patch{};
     };
+
+    void annotations_initialize(annotations_t& ann);
+    void annotations_finailze(annotations_t& ann);
 
     /// Fetch scm revision for a given file in another thread.
     request_t fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges);
@@ -40,7 +46,7 @@ namespace timelapse { namespace scm {
     size_t dispose_request(request_t request);
 
     /// Returns the request result if done.
-    string_t request_result(request_t request);
+    string_t* request_results(request_t request);
 
     /// Parse the fetch revisions output and return the revision list container.
     generics::vector<revision_t> revision_list(const string_t& result);

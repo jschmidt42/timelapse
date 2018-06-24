@@ -143,6 +143,21 @@ timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path,
         size_t line_occurence = string_occurence(STRING_ARGS(output), STRING_NEWLINE[0]);
         string_const_t* changes = (string_const_t*)memory_allocate(HASH_SCM, line_occurence * sizeof string_const_t, 0, 0);
         size_t change_count = string_explode(STRING_ARGS(output), STRING_CONST("\n"), changes, line_occurence, false);
+
+//         std::string cc = R"(hg log --template "{date}" -r ")";
+// 
+//         for (size_t i = 0; i < change_count; ++i)
+//         {
+//             string_const_t infos[1];
+//             string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
+//             cc += "min(descendants(" + std::string(infos[0].str, infos[0].length) + ") and branch(.))";
+// 
+//             if (i+1 < change_count)
+//                 cc += "+";
+//         }
+// 
+//         cc += "\"";
+// 
         for (size_t i = 0; i < change_count; ++i)
         {
             string_const_t infos[8];

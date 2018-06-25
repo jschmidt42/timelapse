@@ -24,7 +24,7 @@ int g_current_revision_id = -1;
 int g_last_fetched_revid_annotations = 0;
 generics::vector<scm::revision_t> g_revisions;
 
-void cleanup()
+static void cleanup()
 {
     string_deallocate(g_file_path.str);
     string_deallocate(g_working_dir.str);
@@ -46,6 +46,11 @@ static void clear_revisions_info()
     g_revisions.clear();
     g_current_revision_id = -1;
     g_last_fetched_revid_annotations = 0;
+}
+
+static bool revision_compare(const scm::revision_t& a, const scm::revision_t& b)
+{
+    return strcmp(a.rawdate.str, b.rawdate.str) < 0;
 }
 
 void setup(const char* file_path)
@@ -105,6 +110,8 @@ void update()
             g_revisions = scm::revision_list(results, array_size(results));
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
+            std::sort(g_revisions.begin(), g_revisions.end(), revision_compare);
+
             if (g_revisions.size() > 0)
                 set_current_revision(g_revisions.back().id);
         }
@@ -149,6 +156,8 @@ void update()
                 std::swap(rev.patch, annotations.patch);
                 std::swap(rev.rawdate, annotations.date);
                 std::swap(rev.annotations, annotations.lines);
+
+                std::sort(g_revisions.begin(), g_revisions.end(), revision_compare);
 
                 break;
             }

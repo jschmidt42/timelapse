@@ -13,8 +13,6 @@
 #include "foundation/beacon.h"
 #include "foundation/array.h"
 
-#include <algorithm> // REMOVE ME
-
 #define SCM_ARRAYSIZE(_ARR) ((size_t)(sizeof(_ARR)/sizeof(*(_ARR))))
 #define HASH_SCM (static_hash_string("scm", 3, 3754008690416994104ULL))
 
@@ -278,7 +276,7 @@ generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const
         revisions.push_back(r);
     }
 
-    std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return strcmp(a.rawdate.str, b.rawdate.str) < 0; });
+    //std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return strcmp(a.rawdate.str, b.rawdate.str) < 0; });
 
     return revisions;
 }

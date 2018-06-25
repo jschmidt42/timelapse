@@ -20,9 +20,9 @@ scm::request_t g_request_fetch_revisions = 0;
 scm::request_t g_request_fetch_single_revision = 0;
 
 // Fetch revision data
-size_t g_revision_cursor = -1;
-generics::vector<scm::revision_t> g_revisions;
+int g_current_revision_id = -1;
 int g_last_fetched_revid_annotations = 0;
+generics::vector<scm::revision_t> g_revisions;
 
 void cleanup()
 {
@@ -44,7 +44,7 @@ static void clear_revisions_info()
     for (auto& rev: g_revisions)
         scm::revision_deallocate(rev);
     g_revisions.clear();
-    g_revision_cursor = -1;
+    g_current_revision_id = -1;
     g_last_fetched_revid_annotations = 0;
 }
 
@@ -101,25 +101,24 @@ void update()
         // Check fetched revisions
         if (scm::is_request_done(g_request_fetch_revisions))
         {
-            size_t revision_count_before = g_revisions.size();
-
             const string_t* results = scm::request_results(g_request_fetch_revisions);
             g_revisions = scm::revision_list(results, array_size(results));
             g_request_fetch_revisions = scm::dispose_request(g_request_fetch_revisions);
 
-            set_revision_cursor((g_revision_cursor + 1) + (g_revisions.size() - revision_count_before) - 1);
+            if (g_revisions.size() > 0)
+                set_current_revision(g_revisions.back().id);
         }
     }
 
     if (g_request_fetch_single_revision == 0 && !g_revisions.empty())
     {
-        if (g_revision_cursor < g_revisions.size())
+        scm::revision_t* crev = current_revision();
+        if (crev)
         {
-            const auto& crev = g_revisions[g_revision_cursor];
-            if (array_size(crev.annotations) == 0)
+            if (array_size(crev->annotations) == 0)
             {
-                g_last_fetched_revid_annotations = crev.id;
-                g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), crev.id);
+                g_last_fetched_revid_annotations = crev->id;
+                g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), crev->id);
             }
         }
 
@@ -159,11 +158,6 @@ void update()
     }
 }
 
-size_t revision_curosr()
-{
-    return g_revision_cursor;
-}
-
 const generics::vector<scm::revision_t>& revisions()
 {
     return g_revisions;
@@ -179,18 +173,62 @@ int is_fetching_annotations()
 
 string_const_t rev_node()
 {
-    if (g_revisions.empty())
+    scm::revision_t* crev = current_revision();
+    if (!crev)
         return string_empty();
-    return string_to_const(g_revisions[g_revision_cursor].rev);
+    return string_to_const(crev->rev);
 }
 
-size_t set_revision_cursor(size_t revision)
+int revision_cursor()
 {
-    if (!g_revisions.empty())
-        g_revision_cursor = generics::max(0ULL, generics::min((size_t)revision, g_revisions.size()-1ULL));
+    if (g_current_revision_id <= 0)
+        return -1;
+
+    for (size_t i = 0, end = (int)g_revisions.size(); i != end; ++i)
+    {
+        if (g_revisions[i].id == g_current_revision_id)
+            return (int)i;
+    }
+
+    return -1;
+}
+
+void set_revision_cursor(int index)
+{
+    const int revision_count = (int)g_revisions.size();
+    if (index >= 0)
+        index = index % revision_count;
     else
-        g_revision_cursor = -1;
-    return g_revision_cursor;
+        index = revision_count + index;
+    if (index >= 0 && index < revision_count)
+        set_current_revision(g_revisions[index].id);
+}
+
+scm::revision_t* revision(int id)
+{
+    for (auto& rev: g_revisions)
+        if (rev.id == id)
+            return &rev;
+    return nullptr;
+}
+
+int set_current_revision(int id)
+{
+    for (auto& rev : g_revisions)
+    {
+        if (rev.id == id)
+        {
+            g_current_revision_id = id;
+            return id;
+        }
+    }
+    g_current_revision_id = -1;
+    return g_current_revision_id;
+}
+
+scm::revision_t* current_revision()
+{
+    return revision(g_current_revision_id);
 }
 
 bool is_valid()

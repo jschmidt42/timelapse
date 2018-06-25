@@ -14,8 +14,13 @@ namespace timelapse { namespace session {
     bool is_fetching_revisions();
     bool has_revisions();
     void update();
-    size_t revision_curosr();
-    size_t set_revision_cursor(size_t revision);
+
+    int revision_cursor();
+    void set_revision_cursor(int index);
+
+    scm::revision_t* revision(int id);
+    int set_current_revision(int id);
+    scm::revision_t* current_revision();
     const generics::vector<scm::revision_t>& revisions();
     int is_fetching_annotations();
     string_const_t rev_node();

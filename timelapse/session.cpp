@@ -119,29 +119,32 @@ void update()
 
     if (g_request_fetch_single_revision == 0 && !g_revisions.empty())
     {
-        scm::revision_t* crev = current_revision();
-        if (crev)
-        {
-            if (array_size(crev->annotations) == 0)
-            {
-                g_last_fetched_revid_annotations = crev->id;
-                g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), crev->id);
-            }
-        }
+        int fetch_new_revision_id = -1;
 
-        if (g_request_fetch_single_revision == 0)
+        // Make sure we have annotations data for the current revision
+        scm::revision_t* crev = current_revision();
+        if (crev && array_size(crev->annotations) == 0)
         {
-            // Fetch extra info for individual revisions
+            fetch_new_revision_id = crev->id;
+        }
+        else if (g_request_fetch_single_revision == 0)
+        {
+            // Otherwise fetch extra info for individual revisions
             for (size_t i = g_revisions.size()-1; i != -1; --i)
             {
                 auto& rev = g_revisions[i];
                 if (array_size(rev.annotations) == 0)
                 {
-                    g_last_fetched_revid_annotations = rev.id;
-                    g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), rev.id);
+                    fetch_new_revision_id = rev.id;
                     break;
                 }
             }
+        }
+
+        if (fetch_new_revision_id != -1)
+        {
+            g_last_fetched_revid_annotations = fetch_new_revision_id;
+            g_request_fetch_single_revision = scm::fetch_revision_annotations(file_path(), working_dir(), fetch_new_revision_id);
         }
     }
     else if (g_request_fetch_single_revision != 0 && scm::is_request_done(g_request_fetch_single_revision))

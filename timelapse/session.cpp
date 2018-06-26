@@ -50,7 +50,11 @@ static void clear_revisions_info()
 
 static bool revision_compare(const scm::revision_t& a, const scm::revision_t& b)
 {
-    if (a.merged_date.length == 0 || b.merged_date.length == 0)
+    if (a.merged_date.length == 0 && b.merged_date.length != 0)
+        return false;
+    if (a.merged_date.length != 0 && b.merged_date.length == 0)
+        return true;
+    if (a.merged_date.length == 0 && b.merged_date.length == 0)
         return strcmp(a.date.str, b.date.str) < 0;
     return strcmp(a.merged_date.str, b.merged_date.str) < 0;
 }

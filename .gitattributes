@@ -6,30 +6,7 @@
 # Text files
 
 *.bsdoc text
-*.c text
 *.config text
-*.cpp text
-*.cs text
-*.css text
-*.DotSettings text
-*.erb text
-*.h text
-*.H text
-*.html text
-*.inl text
-*.java text
-*.js text
-*.json text
-*.m text
-*.md text
-*.mm text
-*.py text
-*.rb text
-*.resx text
-*.ts text
-*.txt text
-*.xaml text
-*.xml text
 
 # npm edited json files
 
@@ -99,8 +76,6 @@ package.json text eol=lf
 
 # Project binary files
 
-*.exe binary
-*.lib binary
 *.dds binary
 *.mb binary
 *.physx_metadata binary

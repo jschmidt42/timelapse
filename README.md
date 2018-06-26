@@ -42,6 +42,10 @@ Timelapse View for HG
 
   ![image](https://user-images.githubusercontent.com/4054655/41930374-df55c8c4-7948-11e8-805d-915a6502c49a.png)
   
+- Show the file change set using a simple lis view
+
+  ![timelapse_file_changeset](https://user-images.githubusercontent.com/4054655/41935995-b3c400e8-7959-11e8-9a01-b324d6487212.gif)
+  
 - Launching multiple `hg` process in background thread to keep the UI responsive.
 
 # Download

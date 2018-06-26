@@ -50,7 +50,9 @@ static void clear_revisions_info()
 
 static bool revision_compare(const scm::revision_t& a, const scm::revision_t& b)
 {
-    return strcmp(a.rawdate.str, b.rawdate.str) < 0;
+    if (a.merged_date.length == 0 || b.merged_date.length == 0)
+        return strcmp(a.date.str, b.date.str) < 0;
+    return strcmp(a.merged_date.str, b.merged_date.str) < 0;
 }
 
 void setup(const char* file_path)
@@ -156,7 +158,8 @@ void update()
         if (rev)
         {
             std::swap(rev->patch, annotations.patch);
-            std::swap(rev->rawdate, annotations.date);
+            std::swap(rev->base_summary, annotations.base_summary);
+            std::swap(rev->merged_date, annotations.date);
             std::swap(rev->annotations, annotations.lines);
             FOUNDATION_ASSERT(array_size(rev->annotations) != 0);
 

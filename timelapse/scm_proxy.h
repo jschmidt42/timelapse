@@ -14,11 +14,14 @@ namespace timelapse { namespace scm {
         string_t author{};
         string_t branch{};
         string_t date{};
-        string_t rawdate{};
+        string_t dateold{};
+        string_t merged_date{};
         string_t description{};
 
-        string_t* annotations{};
         string_t patch{};
+        string_t base_summary{};
+
+        string_t* annotations{};
     };
 
     void revision_initialize(revision_t& r, string_const_t* infos);
@@ -29,6 +32,7 @@ namespace timelapse { namespace scm {
         int revid{};
         string_t file{};
         string_t date{};
+        string_t base_summary{};
         string_t* lines{};
         string_t patch{};
     };

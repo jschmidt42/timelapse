@@ -25,6 +25,7 @@ struct command_t
 
     thread_t* thread{};
 
+    unsigned exit_code;
     string_t* results{};
 };
 
@@ -72,7 +73,7 @@ static void command_deallocate(command_t* cmd)
     memory_deallocate(cmd);
 }
 
-static string_t execute_command(const char* cmd, const char* working_directory)
+static string_t execute_command(const char* cmd, const char* working_directory, unsigned& exit_code)
 {
     SECURITY_ATTRIBUTES saAttr;
     saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -135,6 +136,10 @@ static string_t execute_command(const char* cmd, const char* working_directory)
         }
     }
 
+    DWORD dwExitCode = 0;
+    GetExitCodeProcess(pi.hProcess, &dwExitCode);
+    exit_code = (unsigned)dwExitCode;
+
     CloseHandle(hPipeWrite);
     CloseHandle(hPipeRead);
     CloseHandle(pi.hProcess);
@@ -145,7 +150,10 @@ static string_t execute_command(const char* cmd, const char* working_directory)
 static void* execute_cmd_line_request(void *arg)
 {
     command_t* cmd = (command_t*)arg;
-    scoped_string_t output = execute_command(cmd->line.str, cmd->dir.str);
+    scoped_string_t output = execute_command(cmd->line.str, cmd->dir.str, cmd->exit_code);
+
+    if (cmd->exit_code != 0)
+        return (void*)(size_t)cmd->exit_code;
     
     lines_t lines = string_split_lines(STRING_ARGS(output.value));
     for (size_t i = 0; i < lines.count; ++i)
@@ -162,20 +170,54 @@ static void* execute_annotations_request(void *arg)
     // TODO: Add option to ignore whitespaces
     // TODO annotate -d -q to have short dates
     
-    scoped_string_t annotate = string_allocate_format(STRING_CONST("hg annotate --user -a -c -r %d \"%s\""), cmd->context, cmd->file.str);
-    scoped_string_t output = execute_command(annotate, cmd->dir.str);
-    array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
+    {
+        scoped_string_t annotate = string_allocate_format(STRING_CONST("hg annotate --user -a -c -r %d \"%s\""), cmd->context, cmd->file.str);
+        scoped_string_t output = execute_command(annotate, cmd->dir.str, cmd->exit_code);
+        if (cmd->exit_code != 0)
+            return (void*)(size_t)cmd->exit_code;
 
-    // TODO: Base on a specified branch (i.e. replace . with trunk)
-    scoped_string_t extras = string_allocate_format(STRING_CONST("hg log --template \"{date}\" -r \"min(descendants(%d) and branch(.))\""), cmd->context);
-    output = execute_command(extras, cmd->dir.str);
-    array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
+        array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
+    }
 
-    scoped_string_t patch = string_allocate_format(STRING_CONST("hg diff -c %d -- \"%s\""), cmd->context, cmd->file.str);
-    output = execute_command(patch, cmd->dir.str);
-    array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
+    {
+        // TODO: Base on a specified branch (i.e. replace . with trunk)
+        scoped_string_t base_revision_log = string_allocate_format(STRING_CONST(
+            "hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(parents(min(branch(%d)))))\""), cmd->context, cmd->context);
+        //scoped_string_t rebased_info = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}\" -r \"min(descendants(%d) and branch(.))\""), cmd->context);
+        scoped_string_t output = execute_command(base_revision_log, cmd->dir.str, cmd->exit_code);
+        if (cmd->exit_code != 0)
+            return (void*)(size_t)cmd->exit_code;
+
+        string_const_t infos[2];
+        infos[0] = {0, 0};
+        infos[1] = {0, 0};
+        string_explode(STRING_ARGS(output.value), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), true);
+
+        array_push(cmd->results, string_clone(STRING_ARGS(infos[0])));
+        array_push(cmd->results, string_clone(STRING_ARGS(infos[1])));
+    }
+    
+    {
+        scoped_string_t patch = string_allocate_format(STRING_CONST("hg diff -c %d -- \"%s\""), cmd->context, cmd->file.str);
+        scoped_string_t output = execute_command(patch, cmd->dir.str, cmd->exit_code);
+        if (cmd->exit_code != 0)
+            return (void*)(size_t)cmd->exit_code;
+
+        array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
+    }
 
     return 0;
+}
+
+timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)
+{
+    command_t* cmd = command_allocate(0, file_path, working_dir, execute_cmd_line_request);
+
+    command_execute(cmd, STRING_CONST(
+        "hg log --template \"{rev}|{author|user}|{node|short}|{date|age}|{date|isodate}|{branch}|{desc|strip|firstline}\\n\" " \
+        "-r \"ancestors(branch(.))\" %s \"%s\""), wants_merges ? "" : "--no-merges", file_path);
+
+    return (request_t)cmd;
 }
 
 void timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos)
@@ -183,12 +225,14 @@ void timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos)
     r.id = string_to_int(STRING_ARGS(infos[0]));
     r.author = string_clone_string(infos[1]);
     r.rev = string_clone_string(infos[2]);
-    r.date = string_clone_string(infos[3]);
-    r.rawdate = string_clone_string(infos[4]);
+    r.dateold = string_clone_string(infos[3]);
+    r.date = string_clone_string(infos[4]);
     r.branch = string_clone_string(infos[5]);
     r.description = string_clone_string(infos[6]);
 
     r.patch = {0,0};
+    r.merged_date = {0,0};
+    r.base_summary = {0,0};
     r.annotations = nullptr;
 }
 
@@ -198,9 +242,11 @@ void timelapse::scm::revision_deallocate(revision_t& rev)
     string_deallocate(rev.author.str);
     string_deallocate(rev.branch.str);
     string_deallocate(rev.date.str);
-    string_deallocate(rev.rawdate.str);
+    string_deallocate(rev.dateold.str);
+    string_deallocate(rev.merged_date.str);
     string_deallocate(rev.description.str);
     string_deallocate(rev.patch.str);
+    string_deallocate(rev.base_summary.str);
 
     string_array_deallocate(rev.annotations);
 }
@@ -211,6 +257,7 @@ void timelapse::scm::annotations_initialize(annotations_t& ann)
     ann.file = { 0, 0 };
     ann.date = { 0, 0 };
     ann.patch = { 0, 0 };
+    ann.base_summary = { 0, 0};
     ann.lines = nullptr;
 }
 
@@ -219,19 +266,9 @@ void timelapse::scm::annotations_finailze(annotations_t& ann)
     string_deallocate(ann.file.str);
     string_deallocate(ann.date.str);
     string_deallocate(ann.patch.str);
+    string_deallocate(ann.base_summary.str);
 
     string_array_deallocate(ann.lines);
-}
-
-timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path, const char* working_dir, bool wants_merges)
-{
-    command_t* cmd = command_allocate(0, file_path, working_dir, execute_cmd_line_request);
-
-    command_execute(cmd, STRING_CONST(
-        "hg log --template \"{rev}|{author|user}|{node|short}|{date|shortdate}|{date}|{branch}|{desc|strip|firstline}\\n\" " \
-        "-r \"ancestors(branch(.))\" %s \"%s\""), wants_merges ? "" : "--no-merges", file_path);
-    
-    return (request_t)cmd;
 }
 
 bool timelapse::scm::is_request_done(request_t request)
@@ -303,13 +340,23 @@ timelapse::scm::annotations_t timelapse::scm::revision_annotations(request_t req
     ann.revid = cmd->context;
 
     ann.file = string_clone(STRING_ARGS(cmd->file));
-    ann.date = string_clone(STRING_ARGS(cmd->results[1]));
-    ann.patch = string_clone(STRING_ARGS(cmd->results[2]));
 
-    lines_t lines = string_split_lines(STRING_ARGS(cmd->results[0]));
-    for (size_t i = 0; i < lines.count; ++i)
-        array_push(ann.lines, string_clone(STRING_ARGS(lines[i])));
-    string_lines_finalize(lines);
+    if (array_size(cmd->results) >= 1)
+    {
+        lines_t lines = string_split_lines(STRING_ARGS(cmd->results[0]));
+        for (size_t i = 0; i < lines.count; ++i)
+            array_push(ann.lines, string_clone(STRING_ARGS(lines[i])));
+        string_lines_finalize(lines);
+    }
+
+    if (array_size(cmd->results) >= 2)
+        ann.date = string_clone(STRING_ARGS(cmd->results[1]));
+
+    if (array_size(cmd->results) >= 3)
+        ann.base_summary = string_clone(STRING_ARGS(cmd->results[2]));
+
+    if (array_size(cmd->results) >= 4)
+        ann.patch = string_clone(STRING_ARGS(cmd->results[3]));
     
     return ann;
 }

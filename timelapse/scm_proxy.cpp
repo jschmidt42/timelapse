@@ -171,6 +171,7 @@ static void* execute_annotations_request(void *arg)
     // TODO annotate -d -q to have short dates
     
     {
+        // scoped_string_t annotate = string_allocate_format(STRING_CONST("hg cat -r %d \"%s\""), cmd->context, cmd->file.str);
         scoped_string_t annotate = string_allocate_format(STRING_CONST("hg annotate --user -a -c -r %d \"%s\""), cmd->context, cmd->file.str);
         scoped_string_t output = execute_command(annotate, cmd->dir.str, cmd->exit_code);
         if (cmd->exit_code != 0)
@@ -181,9 +182,8 @@ static void* execute_annotations_request(void *arg)
 
     {
         // TODO: Base on a specified branch (i.e. replace . with trunk)
-        scoped_string_t base_revision_log = string_allocate_format(STRING_CONST(
-            "hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(parents(min(branch(%d)))))\""), cmd->context, cmd->context);
-        //scoped_string_t rebased_info = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}\" -r \"min(descendants(%d) and branch(.))\""), cmd->context);
+        //scoped_string_t base_revision_log = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(parents(min(branch(%d)))))\""), cmd->context, cmd->context);
+        scoped_string_t base_revision_log = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(trunk))\""), cmd->context);
         scoped_string_t output = execute_command(base_revision_log, cmd->dir.str, cmd->exit_code);
         if (cmd->exit_code != 0)
             return (void*)(size_t)cmd->exit_code;
@@ -215,7 +215,13 @@ timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path,
 
     command_execute(cmd, STRING_CONST(
         "hg log --template \"{rev}|{author|user}|{node|short}|{date|age}|{date|isodate}|{branch}|{desc|strip|firstline}\\n\" " \
-        "-r \"ancestors(branch(.))\" %s \"%s\""), wants_merges ? "" : "--no-merges", file_path);
+        " %s -r \"ancestors(branch(.))\" %s \"%s\""), 
+        #if BUILD_DEBUG
+            "--date -360 ",
+        #else
+            "",
+        #endif
+        wants_merges ? "" : "--no-merges", file_path);
 
     return (request_t)cmd;
 }

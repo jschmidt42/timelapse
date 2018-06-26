@@ -51,7 +51,7 @@ namespace session {
     const generics::vector<scm::revision_t>& revisions();
 
     /// Are we currently fetching some revision data (i.e. annotations, patch, meta-data, etc.)
-    int is_fetching_annotations();
+    bool is_fetching_annotations();
 
     /// Returns the current revision node info if any, otherwise an empty string is returned.
     string_const_t rev_node();

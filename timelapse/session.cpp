@@ -127,7 +127,7 @@ void update()
         {
             fetch_new_revision_id = crev->id;
         }
-        else if (g_request_fetch_single_revision == 0)
+        else
         {
             // Otherwise fetch extra info for individual revisions
             for (size_t i = g_revisions.size()-1; i != -1; --i)
@@ -152,18 +152,15 @@ void update()
         scm::annotations_t annotations = scm::revision_annotations(g_request_fetch_single_revision);
         g_request_fetch_single_revision = scm::dispose_request(g_request_fetch_single_revision);
 
-        for(auto& rev: g_revisions)
+        scm::revision_t* rev = find_revision(annotations.revid);
+        if (rev)
         {
-            if (annotations.revid == rev.id)
-            {                
-                std::swap(rev.patch, annotations.patch);
-                std::swap(rev.rawdate, annotations.date);
-                std::swap(rev.annotations, annotations.lines);
+            std::swap(rev->patch, annotations.patch);
+            std::swap(rev->rawdate, annotations.date);
+            std::swap(rev->annotations, annotations.lines);
+            FOUNDATION_ASSERT(array_size(rev->annotations) != 0);
 
-                std::sort(g_revisions.begin(), g_revisions.end(), revision_compare);
-
-                break;
-            }
+            std::sort(g_revisions.begin(), g_revisions.end(), revision_compare);
         }
 
         scm::annotations_finailze(annotations);
@@ -216,7 +213,7 @@ void set_revision_cursor(int index)
         set_current_revision(g_revisions[index].id);
 }
 
-scm::revision_t* revision(int id)
+scm::revision_t* find_revision(int id)
 {
     for (auto& rev: g_revisions)
         if (rev.id == id)
@@ -240,7 +237,7 @@ int set_current_revision(int id)
 
 scm::revision_t* current_revision()
 {
-    return revision(g_current_revision_id);
+    return find_revision(g_current_revision_id);
 }
 
 bool is_valid()

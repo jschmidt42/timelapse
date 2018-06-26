@@ -18,7 +18,7 @@ namespace timelapse { namespace session {
     int revision_cursor();
     void set_revision_cursor(int index);
 
-    scm::revision_t* revision(int id);
+    scm::revision_t* find_revision(int id);
     int set_current_revision(int id);
     scm::revision_t* current_revision();
     const generics::vector<scm::revision_t>& revisions();

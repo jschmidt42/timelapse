@@ -1,16 +1,19 @@
 * text=auto
 
+# .gitattributes file
+.gitignore diff
+
 # Text files
 
 *.bsdoc text
-*.c text eol=lf
+*.c text
 *.config text
-*.cpp text eol=lf
+*.cpp text
 *.cs text
 *.css text
 *.DotSettings text
 *.erb text
-*.h text eol=lf
+*.h text
 *.H text
 *.html text
 *.inl text
@@ -96,6 +99,8 @@ package.json text eol=lf
 
 # Project binary files
 
+*.exe binary
+*.lib binary
 *.dds binary
 *.mb binary
 *.physx_metadata binary

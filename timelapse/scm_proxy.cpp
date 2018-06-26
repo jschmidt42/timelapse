@@ -74,13 +74,13 @@ static void command_deallocate(command_t* cmd)
 
 static string_t execute_command(const char* cmd, const char* working_directory)
 {
-    HANDLE hPipeRead, hPipeWrite;
-
-    SECURITY_ATTRIBUTES saAttr = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
-    saAttr.bInheritHandle = TRUE;   //Pipe handles are inherited by child process.
+    SECURITY_ATTRIBUTES saAttr;
+    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
     saAttr.lpSecurityDescriptor = nullptr;
+    saAttr.bInheritHandle = TRUE;
 
     // Create a pipe to get results from child's stdout.
+    HANDLE hPipeRead, hPipeWrite;
     if (!CreatePipe(&hPipeRead, &hPipeWrite, &saAttr, 0))
         return {0, 0};
 
@@ -93,44 +93,44 @@ static string_t execute_command(const char* cmd, const char* working_directory)
     si.wShowWindow = SW_HIDE;
 
     PROCESS_INFORMATION pi = { nullptr, nullptr, 0, 0 };
-
-    const BOOL fSuccess = CreateProcessA(nullptr, (LPSTR)cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE, nullptr,
-        working_directory ? working_directory : environment_current_working_directory().str, &si, &pi);
-    if (!fSuccess)
+    if (!CreateProcessA(nullptr, (LPSTR)cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE | HIGH_PRIORITY_CLASS, nullptr,
+        working_directory ? working_directory : environment_current_working_directory().str, &si, &pi))
     {
         CloseHandle(hPipeWrite);
         CloseHandle(hPipeRead);
         return {0, 0};
     }
 
-    string_t strResult = string_allocate(0, 1024);
-    bool bProcessEnded = false;
-    for (; !bProcessEnded;)
+    string_t output = {0, 0};
+    bool process_ended = false;
+    while(!process_ended)
     {
+        if (thread_try_wait(1))
+            break; // Thread needs to shutdown
+
         // Give some timeslice (50ms), so we won't waste 100% cpu.
-        bProcessEnded = WaitForSingleObject(pi.hProcess, 50) == WAIT_OBJECT_0;
+        process_ended = WaitForSingleObject(pi.hProcess, 50) == WAIT_OBJECT_0;
 
         // Even if process exited - we continue reading, if there is some data available over pipe.
         for (;;)
         {
-            char buf[1024];
-            DWORD dwRead = 0;
-            DWORD dwAvail = 0;
+            if (thread_try_wait(1))
+                process_ended = true;  // Thread needs to shutdown
 
-            if (!::PeekNamedPipe(hPipeRead, nullptr, 0, nullptr, &dwAvail, nullptr))
+            DWORD bytes_available = 0;
+            if (!::PeekNamedPipe(hPipeRead, nullptr, 0, nullptr, &bytes_available, nullptr))
                 break;
 
-            if (!dwAvail) // no data available, return
-                break;
+            if (!bytes_available)
+                break; // no data available, return
 
-            if (!::ReadFile(hPipeRead, buf, (DWORD)generics::min(sizeof(buf) - 1, (size_t)dwAvail), &dwRead, nullptr) || !dwRead)
-                // error, the child process might ended
-                break;
-
-            buf[dwRead] = 0;
-
-            string_t temp = strResult;
-            strResult = string_allocate_concat(STRING_ARGS(strResult), buf, dwRead-1);
+            char buf[8192];
+            DWORD bytes_read = 0;
+            if (!::ReadFile(hPipeRead, buf, generics::min((DWORD)sizeof(buf), bytes_available), &bytes_read, nullptr) || !bytes_read)
+                break; // error, the child process might ended
+            
+            string_t temp = output;
+            output = string_allocate_concat(STRING_ARGS(output), buf, bytes_read);
             string_deallocate(temp.str);
         }
     }
@@ -139,7 +139,7 @@ static string_t execute_command(const char* cmd, const char* working_directory)
     CloseHandle(hPipeRead);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    return strResult;
+    return output;
 }
 
 static void* execute_cmd_line_request(void *arg)
@@ -166,6 +166,7 @@ static void* execute_annotations_request(void *arg)
     scoped_string_t output = execute_command(annotate, cmd->dir.str);
     array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
 
+    // TODO: Base on a specified branch (i.e. replace . with trunk)
     scoped_string_t extras = string_allocate_format(STRING_CONST("hg log --template \"{date}\" -r \"min(descendants(%d) and branch(.))\""), cmd->context);
     output = execute_command(extras, cmd->dir.str);
     array_push(cmd->results, string_clone(STRING_ARGS(output.value)));
@@ -247,7 +248,10 @@ size_t timelapse::scm::dispose_request(request_t request)
     command_t* cmd = (command_t*)request;
 
     if (thread_is_running(cmd->thread))
-        beacon_try_wait(&cmd->thread->beacon, 500);
+    {
+        thread_signal(cmd->thread);
+        thread_join(cmd->thread);
+    }
 
     command_deallocate(cmd);
     return 0;
@@ -275,8 +279,6 @@ generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const
         revision_initialize(r, infos);
         revisions.push_back(r);
     }
-
-    //std::sort(revisions.begin(), revisions.end(), [](const revision_t& a, const revision_t& b) { return strcmp(a.rawdate.str, b.rawdate.str) < 0; });
 
     return revisions;
 }

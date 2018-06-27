@@ -12,6 +12,7 @@
 #include "foundation/hash.h"
 #include "foundation/beacon.h"
 #include "foundation/array.h"
+#include "foundation/log.h"
 
 #define SCM_ARRAYSIZE(_ARR) ((size_t)(sizeof(_ARR)/sizeof(*(_ARR))))
 #define HASH_SCM (static_hash_string("scm", 3, 3754008690416994104ULL))
@@ -226,8 +227,14 @@ timelapse::scm::request_t timelapse::scm::fetch_revisions(const char* file_path,
     return (request_t)cmd;
 }
 
-void timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos)
+bool timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos, size_t info_count)
 {
+    if (!infos || info_count != 7)
+    {
+        log_errorf(HASH_SCM, ERROR_INVALID_VALUE, STRING_CONST("Failed to initialize revision with data %s"), info_count > 0 ? infos[0].str : "");
+        return false;
+    }
+
     r.id = string_to_int(STRING_ARGS(infos[0]));
     r.author = string_clone_string(infos[1]);
     r.rev = string_clone_string(infos[2]);
@@ -240,6 +247,8 @@ void timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos)
     r.merged_date = {0,0};
     r.base_summary = {0,0};
     r.annotations = nullptr;
+
+    return true;
 }
 
 void timelapse::scm::revision_deallocate(revision_t& rev)
@@ -316,11 +325,11 @@ generics::vector<timelapse::scm::revision_t> timelapse::scm::revision_list(const
     for (size_t i = 0; i < change_count; ++i)
     {
         string_const_t infos[16];
-        string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
+        size_t info_count = string_explode(STRING_ARGS(changes[i]), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), false);
 
         revision_t r;
-        revision_initialize(r, infos);
-        revisions.push_back(r);
+        if (revision_initialize(r, infos, info_count))
+            revisions.push_back(r);
     }
 
     return revisions;

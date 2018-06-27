@@ -24,7 +24,7 @@ namespace timelapse { namespace scm {
         string_t* annotations{};
     };
 
-    void revision_initialize(revision_t& r, string_const_t* infos);
+    bool revision_initialize(revision_t& r, string_const_t* infos, size_t info_count);
     void revision_deallocate(revision_t& rev);
 
     struct annotations_t

@@ -243,6 +243,7 @@ bool timelapse::scm::revision_initialize(revision_t& r, string_const_t* infos, s
     r.branch = string_clone_string(infos[5]);
     r.description = string_clone_string(infos[6]);
 
+    r.extra_fetched = false;
     r.patch = {0,0};
     r.merged_date = {0,0};
     r.base_summary = {0,0};

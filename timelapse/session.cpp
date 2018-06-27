@@ -53,9 +53,9 @@ static void clear_revisions_info()
 static bool revision_compare(const scm::revision_t& a, const scm::revision_t& b)
 {
     if (a.merged_date.length == 0 && b.merged_date.length != 0)
-        return false;
+        return strcmp(a.date.str, b.merged_date.str) < 0;
     if (a.merged_date.length != 0 && b.merged_date.length == 0)
-        return true;
+        return strcmp(a.merged_date.str, b.date.str) < 0;
     if (a.merged_date.length == 0 && b.merged_date.length == 0)
         return strcmp(a.date.str, b.date.str) < 0;
     return strcmp(a.merged_date.str, b.merged_date.str) < 0;
@@ -170,11 +170,12 @@ void update()
                 scm::revision_t* rev = find_revision(annotations.revid);
                 if (rev)
                 {
+                    FOUNDATION_ASSERT(array_size(annotations.lines) != 0);
                     std::swap(rev->patch, annotations.patch);
                     std::swap(rev->base_summary, annotations.base_summary);
                     std::swap(rev->merged_date, annotations.date);
                     std::swap(rev->annotations, annotations.lines);
-                    FOUNDATION_ASSERT(array_size(rev->annotations) != 0);
+                    rev->extra_fetched = true;
 
                     std::sort(g_revisions.begin(), g_revisions.end(), revision_compare);
                 }

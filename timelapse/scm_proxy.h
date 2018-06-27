@@ -15,9 +15,10 @@ namespace timelapse { namespace scm {
         string_t branch{};
         string_t date{};
         string_t dateold{};
-        string_t merged_date{};
         string_t description{};
 
+        bool extra_fetched{};
+        string_t merged_date{};
         string_t patch{};
         string_t base_summary{};
 

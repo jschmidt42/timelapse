@@ -3,6 +3,12 @@ Timelapse View for HG
 
 ![preview](https://user-images.githubusercontent.com/4054655/41914971-95a10d40-7922-11e8-95aa-e709832b8b5a.gif)
 
+# Download
+
+You can download the latest pre-built version:
+
+- **Windows (~780 kb)**: <https://github.com/jschmidt42/timelapse/raw/master/release/win64/timelapse.exe>
+
 # Features
 
 - Show all file revisions in a time-browsable view (designed for [Unity](https://unity3d.com/) mercurial repos)
@@ -47,12 +53,6 @@ Timelapse View for HG
   ![timelapse_file_changeset](https://user-images.githubusercontent.com/4054655/41935995-b3c400e8-7959-11e8-9a01-b324d6487212.gif)
   
 - Launching multiple `hg` process in background thread to keep the UI responsive.
-
-# Download
-
-You can download the latest pre-built version:
-
-- **Windows**: <https://github.com/jschmidt42/timelapse/raw/master/release/win64/timelapse.exe>
 
 # Using
 

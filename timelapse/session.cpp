@@ -137,10 +137,10 @@ void update()
 
                 // Make sure we have annotations data for the current revision
                 scm::revision_t* crev = current_revision();
-                if (crev && array_size(crev->annotations) == 0)
+                if (crev && array_capacity(crev->annotations) == 0)
                 {
+                    array_reserve(crev->annotations, 1);
                     fetch_new_revision_id = crev->id;
-                    array_push(crev->annotations, string_clone(STRING_CONST("Fetching data...")));
                 }
                 else
                 {
@@ -148,10 +148,10 @@ void update()
                     for (size_t i = g_revisions.size() - 1; i != -1; --i)
                     {
                         auto& rev = g_revisions[i];
-                        if (array_size(rev.annotations) == 0)
+                        if (array_capacity(rev.annotations) == 0)
                         {
                             fetch_new_revision_id = rev.id;
-                            array_push(rev.annotations, string_clone(STRING_CONST("Fetching data...")));
+                            array_reserve(rev.annotations, 1);
                             break;
                         }
                     }

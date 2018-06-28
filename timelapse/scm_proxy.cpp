@@ -172,8 +172,7 @@ static void* execute_annotations_request(void *arg)
     // TODO annotate -d -q to have short dates
     
     {
-        // scoped_string_t annotate = string_allocate_format(STRING_CONST("hg cat -r %d \"%s\""), cmd->context, cmd->file.str);
-        scoped_string_t annotate = string_allocate_format(STRING_CONST("hg annotate --user -a -c -r %d \"%s\""), cmd->context, cmd->file.str);
+        scoped_string_t annotate = string_allocate_format(STRING_CONST("hg annotate --user -d -q -a -c -r %d \"%s\""), cmd->context, cmd->file.str);
         scoped_string_t output = execute_command(annotate, cmd->dir.str, cmd->exit_code);
         if (cmd->exit_code != 0)
             return (void*)(size_t)cmd->exit_code;
@@ -182,16 +181,14 @@ static void* execute_annotations_request(void *arg)
     }
 
     {
-        // TODO: Base on a specified branch (i.e. replace . with trunk)
-        //scoped_string_t base_revision_log = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(parents(min(branch(%d)))))\""), cmd->context, cmd->context);
+        // TODO: Add a flag/option to change the trunk common base
+        //      NOTE: -r \"min(descendants(%d) and branch(parents(min(branch(%d)))))\"";
         scoped_string_t base_revision_log = string_allocate_format(STRING_CONST("hg log --template \"{date|isodate}|{desc|strip|firstline}\" -r \"min(descendants(%d) and branch(trunk))\""), cmd->context);
         scoped_string_t output = execute_command(base_revision_log, cmd->dir.str, cmd->exit_code);
         if (cmd->exit_code != 0)
             return (void*)(size_t)cmd->exit_code;
 
-        string_const_t infos[2];
-        infos[0] = {0, 0};
-        infos[1] = {0, 0};
+        string_const_t infos[2]; infos[0] = {0, 0}; infos[1] = {0, 0};
         string_explode(STRING_ARGS(output.value), STRING_CONST("|"), infos, SCM_ARRAYSIZE(infos), true);
 
         array_push(cmd->results, string_clone(STRING_ARGS(infos[0])));

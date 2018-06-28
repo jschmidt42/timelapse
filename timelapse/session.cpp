@@ -58,7 +58,10 @@ static bool revision_compare(const scm::revision_t& a, const scm::revision_t& b)
         return strcmp(a.merged_date.str, b.date.str) < 0;
     if (a.merged_date.length == 0 && b.merged_date.length == 0)
         return strcmp(a.date.str, b.date.str) < 0;
-    return strcmp(a.merged_date.str, b.merged_date.str) < 0;
+    int compare_result = strcmp(a.merged_date.str, b.merged_date.str);
+    if (compare_result != 0)
+        return compare_result < 0;
+    return a.id < b.id;
 }
 
 void setup(const char* file_path)
@@ -145,9 +148,9 @@ void update()
                 else
                 {
                     // Otherwise fetch extra info for individual revisions
-                    for (size_t i = g_revisions.size() - 1; i != -1; --i)
+                    for (size_t ri = g_revisions.size() - 1; ri != -1; --ri)
                     {
-                        auto& rev = g_revisions[i];
+                        auto& rev = g_revisions[ri];
                         if (array_capacity(rev.annotations) == 0)
                         {
                             fetch_new_revision_id = rev.id;

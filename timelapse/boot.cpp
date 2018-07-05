@@ -543,15 +543,13 @@ static void glfwSetWindowCenter(GLFWwindow* window)
 
     // Figure out which monitor the window is in
     GLFWmonitor *owner = NULL;
-    int owner_x, owner_y, owner_width, owner_height;
+    int owner_x = 0, owner_y = 0, owner_width = 1, owner_height = 1;
 
     for (int i = 0; i < monitors_length; i++) {
         // Get the monitor position
         int monitor_x, monitor_y;
         glfwGetMonitorPos(monitors[i], &monitor_x, &monitor_y);
 
-        // Get the monitor size from its video mode
-        int monitor_width, monitor_height;
         GLFWvidmode *monitor_vidmode = (GLFWvidmode*)glfwGetVideoMode(monitors[i]);
 
         if (monitor_vidmode == NULL) {
@@ -559,10 +557,9 @@ static void glfwSetWindowCenter(GLFWwindow* window)
             continue;
 
         }
-        else {
-            monitor_width = monitor_vidmode->width;
-            monitor_height = monitor_vidmode->height;
-        }
+        
+        int monitor_width = monitor_vidmode->width;
+        int monitor_height = monitor_vidmode->height;
 
         // Set the owner to this monitor if the center of the window is within its bounding box
         if ((window_x > monitor_x && window_x < (monitor_x + monitor_width)) && (window_y > monitor_y && window_y < (monitor_y + monitor_height))) {
@@ -592,12 +589,14 @@ static GLFWwindow* setup_main_window()
         return nullptr;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     #if __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
     GLFWwindow* window = glfwCreateWindow(1600-2, 900-32, app_title(), nullptr, nullptr);
+    if (window == nullptr)
+        return nullptr;
     glfwSetWindowCenter(window);
 
     glfwMakeContextCurrent(window);
@@ -640,7 +639,10 @@ extern int main_initialize()
 
     GLFWwindow* window = setup_main_window();
     if (!window)
-        return ERROR_INTERNAL_FAILURE;
+    {
+        log_error(0, ERROR_SYSTEM_CALL_FAIL, STRING_CONST("Fail to create main window context."));
+        return ERROR_SYSTEM_CALL_FAIL;
+    }
 
     setup_main_window_icon(window);
     setup_imgui(window);

@@ -23,7 +23,7 @@
     <ProjectGuid>{691D6488-17E6-4415-9086-F268DA799DD6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>timelapse</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -327,6 +327,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\foundation\hashstrings.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\..\resources\timelapse.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

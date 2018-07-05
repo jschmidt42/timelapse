@@ -463,4 +463,9 @@
       <Filter>foundation</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="..\..\resources\timelapse.manifest">
+      <Filter>resources</Filter>
+    </Manifest>
+  </ItemGroup>
 </Project>

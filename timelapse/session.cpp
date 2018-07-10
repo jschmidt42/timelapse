@@ -171,7 +171,7 @@ void update()
                 g_request_fetch_single_revisions[i] = scm::dispose_request(g_request_fetch_single_revisions[i]);
 
                 scm::revision_t* rev = find_revision(annotations.revid);
-                if (rev)
+                if (rev && annotations.lines != nullptr)
                 {
                     FOUNDATION_ASSERT(array_size(annotations.lines) != 0);
                     std::swap(rev->patch, annotations.patch);
